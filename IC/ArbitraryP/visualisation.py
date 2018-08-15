@@ -1,4 +1,4 @@
-from __future__ import division
+
 import json
 import matplotlib.pyplot as plt
 import matplotlib
@@ -50,7 +50,7 @@ def visualiseResults(x_lst, y_lst, filename="tempResults.png", model="Model", da
     # [tick.label.set_fontsize(8) for tick in ax.xaxis.get_major_ticks()]
     # ax.set_yticks([150,250,350,550,750,850,950,1050,1150,1250,1350,1450,1550,1750,1950,2150])
     # xlim = 151
-    ax.set_xticks(range(10, 210, 10))
+    ax.set_xticks(list(range(10, 210, 10)))
 
     # ax.set_xscale("log")
     ax.set_yscale("log")
@@ -61,12 +61,12 @@ def visualiseResults(x_lst, y_lst, filename="tempResults.png", model="Model", da
     #            "HarvesterGAME", "HarvesterGC", "PMIA"]
     legends = ["Random", "Harvester400", "HarvesterADR", "PMIA"]
     legends = ["Random", "MP", "MP+", "SF", "ADR"]
-    legends = map(lambda v: "K%s" %v, range(20, 110, 20))
-    legends = map(lambda v: "MPST%s" %v, range(10,110,10))
+    legends = ["K%s" %v for v in range(20, 110, 20)]
+    legends = ["MPST%s" %v for v in range(10,110,10)]
     # legends = ["MP20","MP50","MP100","MPST20","MPST50","MPST100","Spine20","Spine50","Spine100"]
     # legends = ["MP50","MPST50","Spine50"]
     # legends = ["MP+LP", "MPST+LP"]
-    colors = ['b', 'r', 'g', 'm', 'k', 'y', 'c', u'#fe2fb3', u'#abfeaa', u'#cccabc', u'#1111ee']
+    colors = ['b', 'r', 'g', 'm', 'k', 'y', 'c', '#fe2fb3', '#abfeaa', '#cccabc', '#1111ee']
     marks = ["o", "s", "^", "v", 'x', "<", ">", '8', "<", ">", '8']
     colors = colors[::1]
     marks = marks[::1]
@@ -239,7 +239,7 @@ def plotCCsSizeDistribution (histogram, bluedots, T, filename="plots/CCs_sizes.p
      model -- name of Ep model (eg. MultiValency, Random, Uniform, WC, Categories)
     '''
 
-    [x,y] = zip(*histogram)
+    [x,y] = list(zip(*histogram))
     fig = plt.figure()
     ax = fig.add_subplot(111)
     if xlog:
@@ -441,7 +441,7 @@ if __name__ == "__main__":
             x = []
             y = []
             for line in f:
-                d = map(float, line.split())
+                d = list(map(float, line.split()))
                 x.append(d[0])
                 y.append(d[1])
             x_lst.append(x)

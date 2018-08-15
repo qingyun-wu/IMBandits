@@ -1,6 +1,6 @@
 
-from IC import avgSize
-from CCHeuristic import CC_heuristic
+from .IC import avgSize
+from .CCHeuristic import CC_heuristic
 import time
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ def getDataTvsR(G, maxR, stepR, algo, k = 50, p=.01):
         S = algo(G, k, p, R)
         size = avgSize(G, S, p, R)
         data[R] = size
-        print R
+        print(R)
     return data
 
 if __name__ == "__main__":
@@ -23,14 +23,14 @@ if __name__ == "__main__":
     with open('../graphdata/hep.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u,v, weight=1)
             # G.add_edge(u, v, weight=1)
-    print 'Built graph G'
-    print time.time() - time2build
+    print('Built graph G')
+    print(time.time() - time2build)
 
     data = getDataTvsR(G, 10000, 1000, CC_heuristic, 50, .01)
     R = []

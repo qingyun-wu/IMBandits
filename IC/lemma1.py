@@ -9,7 +9,7 @@ import heapq
 
 import networkx as nx
 
-from IC.IC import runIC
+from .IC.IC import runIC
 
 
 def randomSet(T, k):
@@ -22,14 +22,14 @@ def highdegreeSet(G, T, k):
         for v in T:
             if v in G[u]:
                 d[u] = d.get(u,0) + G[u][v]['weight']
-    top = heapq.nlargest(k, d.iteritems(), key=lambda (key,value): value)
-    print top
+    top = heapq.nlargest(k, iter(d.items()), key=lambda key_value: key_value[1])
+    print(top)
     Gd = dict()
     for u in T:
         for v in G[u]:
             Gd[u] = Gd.get(u,0) + G[u][v]['weight']
-    topG = heapq.nlargest(k, Gd.iteritems(), key=lambda (key,value): value)
-    print topG
+    topG = heapq.nlargest(k, iter(Gd.items()), key=lambda key_value1: key_value1[1])
+    print(topG)
     return [node for (node, value) in top]
 
 if __name__ == '__main__':
@@ -41,13 +41,13 @@ if __name__ == '__main__':
     with open('graphdata/../graphdata/hep.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u,v, weight=1)
-    print 'Built graph G'
-    print time.time() - start
+    print('Built graph G')
+    print(time.time() - start)
 
     # # read in T
     # with open('lemma1.txt') as f:

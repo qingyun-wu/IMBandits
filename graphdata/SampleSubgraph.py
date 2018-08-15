@@ -56,10 +56,10 @@ with open(file_address_5) as f:
 			#print 'maxDegree', max(NodeDegree.iteritems(), key=operator.itemgetter(1))[1], min(NodeDegree.iteritems(), key=operator.itemgetter(1))[1]
 			#print 'AverageDegree', sum(NodeDegree.values())/float(len(NodeDegree))
 		counter +=1
-print 'Finish Processing, Start dumping'
-print 'Total Nodes', len(NodeDegree)
-print 'maxDegree', max(NodeDegree.iteritems(), key=operator.itemgetter(1))[1], min(NodeDegree.iteritems(), key=operator.itemgetter(1))[1]
-print 'AverageDegree', sum(NodeDegree.values())/float(len(NodeDegree))
+print('Finish Processing, Start dumping')
+print('Total Nodes', len(NodeDegree))
+print('maxDegree', max(iter(NodeDegree.items()), key=operator.itemgetter(1))[1], min(iter(NodeDegree.items()), key=operator.itemgetter(1))[1])
+print('AverageDegree', sum(NodeDegree.values())/float(len(NodeDegree)))
 
 ThreeDegree_Counter = 0
 TenDegree_Counter = 0
@@ -77,11 +77,11 @@ for key in NodeDegree:
 	if NodeDegree[key] > Degree_threshold:
 		FinalNodeList.append(key)
 		FinalNodeDegree[key] = NodeDegree[key]
-print ThreeDegree_Counter, TenDegree_Counter, FortyDegree_Counter
+print(ThreeDegree_Counter, TenDegree_Counter, FortyDegree_Counter)
 
-print 'Total Nodes', len(FinalNodeList)
-print 'maxDegree', max(FinalNodeDegree.iteritems(), key=operator.itemgetter(1))[1], min(FinalNodeDegree.iteritems(), key=operator.itemgetter(1))[1]
-print 'AverageDegree', sum(FinalNodeDegree.values())/float(len(FinalNodeDegree))
+print('Total Nodes', len(FinalNodeList))
+print('maxDegree', max(iter(FinalNodeDegree.items()), key=operator.itemgetter(1))[1], min(iter(FinalNodeDegree.items()), key=operator.itemgetter(1))[1])
+print('AverageDegree', sum(FinalNodeDegree.values())/float(len(FinalNodeDegree)))
 
 	
 

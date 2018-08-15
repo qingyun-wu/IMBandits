@@ -4,7 +4,7 @@ Instead of returning seed set, it returns scores that are later reduced.
 Runs only one iteration R.
 '''
 
-from __future__ import division
+
 
 import random
 from copy import deepcopy
@@ -18,7 +18,7 @@ def CC_parallel(G, k, p):
      Output:
      scores -- scores of nodes according to some weight function (dict)
     '''
-    scores = dict(zip(G.nodes(), [0]*len(G))) # initialize scores
+    scores = dict(list(zip(G.nodes(), [0]*len(G)))) # initialize scores
 
     # remove blocked edges from graph G
     E = deepcopy(G)
@@ -27,7 +27,7 @@ def CC_parallel(G, k, p):
 
     # initialize CC
     CC = dict() # each component is reflection os the number of a component to its members
-    explored = dict(zip(E.nodes(), [False]*len(E)))
+    explored = dict(list(zip(E.nodes(), [False]*len(E))))
     c = 0
 
     # perform BFS to discover CC
@@ -36,15 +36,15 @@ def CC_parallel(G, k, p):
             c += 1
             explored[node] = True
             CC[c] = [node]
-            component = E[node].keys()
+            component = list(E[node].keys())
             for neighbor in component:
                 if not explored[neighbor]:
                     explored[neighbor] = True
                     CC[c].append(neighbor)
-                    component.extend(E[neighbor].keys())
+                    component.extend(list(E[neighbor].keys()))
 
     # find ties for components of rank k and add them all as qualified
-    sortedCC = sorted([(len(dv), dk) for (dk, dv) in CC.iteritems()], reverse=True)
+    sortedCC = sorted([(len(dv), dk) for (dk, dv) in CC.items()], reverse=True)
     topCCnumbers = sortedCC[:k]
     L = sum([l for (l,_) in topCCnumbers])
     # add ties of rank k

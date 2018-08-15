@@ -1,10 +1,10 @@
 import networkx as nx
 
-from IC import runIC, avgSize
-from degreeDiscount import degreeDiscountIC
-from newGreedyIC import newGreedyIC
-from CCHeuristic import CC_heuristic
-from singleDiscount import singleDiscount
+from .IC import runIC, avgSize
+from .degreeDiscount import degreeDiscountIC
+from .newGreedyIC import newGreedyIC
+from .CCHeuristic import CC_heuristic
+from .singleDiscount import singleDiscount
 import multiprocessing
 from heapq import nlargest
 import matplotlib.pylab as plt
@@ -20,14 +20,14 @@ if __name__ == '__main__':
     with open('small_graph.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u,v, weight=1)
             # G.add_edge(u, v, weight=1)
-    print 'Built graph G'
-    print time.time() - start
+    print('Built graph G')
+    print(time.time() - start)
 
     seed_size = 5
     p = .01
@@ -36,18 +36,18 @@ if __name__ == '__main__':
 
     spread = dict()
     for candidate in C:
-        print candidate,
+        print(candidate, end=' ')
         time2spread = time.time()
         spread[candidate] = avgSize(G, list(candidate), p, 1000)
-        print spread[candidate], time.time() - time2spread
+        print(spread[candidate], time.time() - time2spread)
 
-    S, val = max(spread.iteritems(), key = lambda (dk, dv): dv)
+    S, val = max(iter(spread.items()), key = lambda dk_dv: dk_dv[1])
 
-    print 'S (by brute-force):', S, ' -->', val
+    print('S (by brute-force):', S, ' -->', val)
 
     S2 = degreeDiscountIC(G, seed_size, p)
-    print 'S (by degree discount):', tuple(S2), ' -->', avgSize(G, S2, p, 1000)
-    print 'S (by degree discount) spreads to %s nodes (according to brute-force)' %(spread[tuple(sorted(S2))])
-    print 'Total time:', time.time() - start
+    print('S (by degree discount):', tuple(S2), ' -->', avgSize(G, S2, p, 1000))
+    print('S (by degree discount) spreads to %s nodes (according to brute-force)' %(spread[tuple(sorted(S2))]))
+    print('Total time:', time.time() - start)
 
     console = []

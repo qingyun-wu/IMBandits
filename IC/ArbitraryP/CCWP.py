@@ -3,14 +3,14 @@
 CCWP heuristic for arbitrary propagation probabilities.
 '''
 
-from __future__ import division
+
 import networkx as nx
 from heapq import nlargest
 from copy import deepcopy, copy
 import os, json, multiprocessing, random
 from runIAC import *
 
-def CCWP((G, k, Ep)):
+def CCWP(xxx_todo_changeme):
     '''
      Input:
      G -- undirected graph (nx.Graph)
@@ -19,12 +19,13 @@ def CCWP((G, k, Ep)):
      Output:
      scores -- scores of nodes according to some weight function (dict)
     '''
-    scores = dict(zip(G.nodes(), [0]*len(G))) # initialize scores
+    (G, k, Ep) = xxx_todo_changeme
+    scores = dict(list(zip(G.nodes(), [0]*len(G)))) # initialize scores
 
     CC = findCC(G, Ep)
 
     # find ties for components of rank k and add them all as qualified
-    sortedCC = sorted([(len(cc), cc_number) for (cc_number, cc) in CC.iteritems()], reverse=True)
+    sortedCC = sorted([(len(cc), cc_number) for (cc_number, cc) in CC.items()], reverse=True)
     topCCnumbers = sortedCC[:k] # CCs we assign scores to
     QN = sum([l for (l, _) in topCCnumbers]) # number of qualified nodes
 
@@ -55,12 +56,12 @@ def timed(func):
         res = func(*args, **kw)
         finish = time.time()
 
-        print 'Time: %s %.4f sec' %(func.__name__, finish-start)
+        print('Time: %s %.4f sec' %(func.__name__, finish-start))
         return res
     return measure_time
 
 def sort_dict(dictionary, reverse=True):
-    return sorted(dictionary.iteritems(), key=lambda (key,value): value, reverse=reverse)
+    return sorted(iter(dictionary.items()), key=lambda key_value: key_value[1], reverse=reverse)
 
 # @timed
 def create_live_edge_graph(G, Ep):
@@ -72,7 +73,7 @@ def create_live_edge_graph(G, Ep):
     elif isinstance(G, nx.Graph):
         E = nx.Graph()
     else:
-        raise ValueError, 'First argument should be nx.DiGraph or nx.Graph. Got %s instead' %(type(G))
+        raise ValueError('First argument should be nx.DiGraph or nx.Graph. Got %s instead' %(type(G)))
     E.add_nodes_from(G.nodes()) # add all nodes in case of isolated components
     live_edges = [edge for edge in G.edges() if random.random() >= (1-Ep[edge])**(G[edge[0]][edge[1]]['weight'])]
     E.add_edges_from(live_edges)
@@ -87,7 +88,7 @@ def find_strongly_connected_components(E):
     scc = nx.strongly_connected_components(E)
     for number, component in enumerate(scc):
         c2n[number] = component
-        n2c.update(dict(zip(component, [number]*len(component))))
+        n2c.update(dict(list(zip(component, [number]*len(component)))))
 
     return n2c, c2n
 
@@ -114,15 +115,15 @@ def find_reach_topsort(dags, c2n):
             cluster = hub.nodes()[0]
             cluster_reach[cluster] = c2n[cluster]
 
-            node_reach.update(dict(zip(c2n[cluster], [len(c2n[cluster])]*len(c2n[cluster]))))
+            node_reach.update(dict(list(zip(c2n[cluster], [len(c2n[cluster])]*len(c2n[cluster])))))
         elif len(hub) == 2:
             cluster1, cluster2 = hub.edges()[0]
 
             cluster_reach[cluster2] = c2n[cluster2]
             cluster_reach[cluster1] = c2n[cluster1] + c2n[cluster2]
 
-            node_reach.update(dict(zip(c2n[cluster1], [len(cluster_reach[cluster1])]*len(c2n[cluster1]))))
-            node_reach.update(dict(zip(c2n[cluster2], [len(cluster_reach[cluster2])]*len(c2n[cluster2]))))
+            node_reach.update(dict(list(zip(c2n[cluster1], [len(cluster_reach[cluster1])]*len(c2n[cluster1])))))
+            node_reach.update(dict(list(zip(c2n[cluster2], [len(cluster_reach[cluster2])]*len(c2n[cluster2])))))
         else:
             hub_ts = nx.topological_sort(hub, reverse=True)
             for cluster in hub_ts:
@@ -132,7 +133,7 @@ def find_reach_topsort(dags, c2n):
                 reach.update(c2n[cluster])
                 cluster_reach[cluster] = reach
 
-                node_reach.update(dict(zip(c2n[cluster], [len(reach)]*len(c2n[cluster]))))
+                node_reach.update(dict(list(zip(c2n[cluster], [len(reach)]*len(c2n[cluster])))))
     return node_reach
 
 # @timed
@@ -158,13 +159,13 @@ def find_reach_undirected(E):
     connected_components = nx.connected_components(E)
     for cc in connected_components:
         cc_size = len(cc)
-        node_reach.update(dict(zip(cc, [cc_size]*cc_size)))
+        node_reach.update(dict(list(zip(cc, [cc_size]*cc_size))))
 
     return node_reach
 
 # @timed
 def assign_scores(node_reach, k):
-    sorted_reach = sorted(node_reach.iteritems(), key= lambda (dk,dv): dv, reverse=True)
+    sorted_reach = sorted(iter(node_reach.items()), key= lambda dk_dv1: dk_dv1[1], reverse=True)
     # find the last index in sorted_reach to which assign a score
     min_value = sorted_reach[k-1][1]
     new_idx = k
@@ -181,11 +182,12 @@ def assign_scores(node_reach, k):
     # scores = dict(zip(selected_nodes, [1]*len(selected_nodes))) # score = 1
     return scores
 
-def Harvester_topsort((G, k, Ep)):
+def Harvester_topsort(xxx_todo_changeme2):
     '''
     Implements Harvester for directed graphs using topological sort to find reach for each node.
     Model: IC
     '''
+    (G, k, Ep) = xxx_todo_changeme2
     assert isinstance(G, nx.DiGraph), '''First argument should be a directed graph, got %s instead.
     Use Harvester_undirected in case of undirected graph''' %type(G)
 
@@ -198,10 +200,11 @@ def Harvester_topsort((G, k, Ep)):
 
     return scores
 
-def Harvester_bfs ((G, k, Ep)):
+def Harvester_bfs (xxx_todo_changeme3):
     '''Implements Harvester for directed graphs using bfs to find reach for each node.
     Model: IC
     '''
+    (G, k, Ep) = xxx_todo_changeme3
     assert isinstance(G, nx.DiGraph), '''First argument should be a directed graph, got %s instead.
     Use Harvester_undirected in case of undirected graph''' %type(G)
 
@@ -212,10 +215,11 @@ def Harvester_bfs ((G, k, Ep)):
 
     return scores
 
-def Harvester_undirected((G, k, Ep)):
+def Harvester_undirected(xxx_todo_changeme4):
     '''Implements Harvester for undirected graphs using connected components to find reach for each node.
     Model: IC
     '''
+    (G, k, Ep) = xxx_todo_changeme4
     assert isinstance(G, nx.Graph), '''First argument should be a undirected graph, got %s instead.
     Use Harvester_bfs or Harvester_topsort in case of directed graph''' %type(G)
 
@@ -233,7 +237,8 @@ def frange(begin, end, step):
         yield x
         x += step
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme5):
+    (G, S, Ep) = xxx_todo_changeme5
     return len(runIAC(G, S, Ep))
 
 if __name__ == '__main__':
@@ -243,7 +248,7 @@ if __name__ == '__main__':
     dataset = "gnu09"
     directed = "U" # "D" for directed case; "U" for undirected case
     model = "Categories"
-    print model, dataset
+    print(model, dataset)
 
     if model == "MultiValency":
         ep_model = "range1"
@@ -257,9 +262,9 @@ if __name__ == '__main__':
         ep_model = "uniform1"
 
     G = nx.read_gpickle("../../graphs/%s%s.gpickle" %(directed, dataset))
-    print 'Read graph G'
-    print time.time() - start
-    print len(G), len(G.edges())
+    print('Read graph G')
+    print(time.time() - start)
+    print(len(G), len(G.edges()))
 
     Ep = dict()
     with open("Ep/%s_Ep_%s_%s.txt" %(directed, dataset, ep_model)) as f:
@@ -293,18 +298,18 @@ if __name__ == '__main__':
 
     for length in range(10, 200, 20):
         time2length = time.time()
-        print 'Start finding solution for length = %s' %length
-        print >>logfile, 'Start finding solution for length = %s' %length
+        print('Start finding solution for length = %s' %length)
+        print('Start finding solution for length = %s' %length, file=logfile)
         time2S = time.time()
 
-        print 'Start mapping...'
+        print('Start mapping...')
         time2map = time.time()
         if pool == None:
             pool = multiprocessing.Pool(processes=4)
-        Scores = map(Harvester_undirected, ((G, length, Ep) for i in range(R)))
-        print 'Finished mapping in', time.time() - time2map
+        Scores = list(map(Harvester_undirected, ((G, length, Ep) for i in range(R))))
+        print('Finished mapping in', time.time() - time2map)
 
-        print 'Start reducing...'
+        print('Start reducing...')
         time2reduce = time.time()
 
         scores = dict()
@@ -318,7 +323,7 @@ if __name__ == '__main__':
         S = []
         # penalization phase
         for it in range(length):
-            maxk, maxv = max(scores_copied.iteritems(), key = lambda (dk, dv): dv)
+            maxk, maxv = max(iter(scores_copied.items()), key = lambda dk_dv: dk_dv[1])
             S.append(maxk)
             scores_copied.pop(maxk) # remove top element from dict
             for v in G[maxk]:
@@ -327,14 +332,14 @@ if __name__ == '__main__':
                     # print weight,
                     penalty = (1-Ep[(maxk, v)])**(G[maxk][v]['weight'])
                     scores_copied[v] *= penalty
-        print 'Finished reducing in', time.time() - time2reduce
+        print('Finished reducing in', time.time() - time2reduce)
 
-        print 'Total:', time.time() - start
+        print('Total:', time.time() - start)
 
-        print S
+        print(S)
         results = pool.map(getCoverage, ((G, S, Ep) for _ in range(I)))
         coverage = sum(results)/len(results)
-        print "Coverage:", coverage
+        print("Coverage:", coverage)
         l2c.append((length, coverage))
         with open("harvester_undirected.txt", "w+") as f:
             json.dump(l2c, f)
@@ -359,7 +364,7 @@ if __name__ == '__main__':
         # print 'Coverage', coverage
 
         # print 'Total time for length = %s: %s sec' %(length, time.time() - time2length)
-        print '----------------------------------------------'
+        print('----------------------------------------------')
 
     # seeds_file.close()
     # dbox_seeds_file.close()

@@ -1,4 +1,4 @@
-from __future__ import division
+
 import networkx as nx
 import random
 
@@ -82,8 +82,8 @@ def update_scores(E, k, scores):
             else:
                 M[node] = 0
         # sort nodes by their reach
-        sorted_outhop_reach = sorted(outhop_reach.iteritems(),
-                                     key = lambda (_,outreach): len(outreach),
+        sorted_outhop_reach = sorted(iter(outhop_reach.items()),
+                                     key = lambda __outreach: len(__outreach[1]),
                                      reverse = True)
         # print sorted_outhop_reach[:2]
         marked_nodes = set()
@@ -100,8 +100,8 @@ def update_scores(E, k, scores):
             if nonoveralpping_nodes == k:
                 break
         else:
-            print 'Number of nonoverlapping nodes is less than k.'
-            print 'Assigned scores to all nodes.'
+            print('Number of nonoverlapping nodes is less than k.')
+            print('Assigned scores to all nodes.')
         # handle ties
         for node, reach in sorted_outhop_reach[last_idx+1:]:
             if len(reach) != len(node_outhop_reach):
@@ -113,10 +113,10 @@ def update_scores(E, k, scores):
         raise NotImplementedError
 
 def select_seeds(G, k ,Ep, scores):
-    selected = dict(zip(G.nodes(), [False]*len(G)))
+    selected = dict(list(zip(G.nodes(), [False]*len(G))))
     S = []
     for i in range(k):
-        node, score = max(scores.iteritems(), key=lambda(node, score): score)
+        node, score = max(iter(scores.items()), key=lambda node_score: node_score[1])
         S.append(node)
         selected[node] = True
         scores.pop(node)
@@ -134,7 +134,7 @@ def Harvester(G, k, Ep, MC):
     '''
 
     # initialization
-    scores = dict(zip(G.nodes(), [0]*len(G)))
+    scores = dict(list(zip(G.nodes(), [0]*len(G))))
     # run Monte-Carlo simulations to find scores
     for it1 in range(MC):
         E = make_possible_world(G, Ep)

@@ -2,12 +2,12 @@
 
 [1] -- Wei Chen et al. Efficient Influence Maximization in Social Networks (Algorithm 2)
 '''
-from __future__ import division
+
 from copy import deepcopy # copy graph object
 from random import random
-from priorityQueue import PriorityQueue as PQ
+from .priorityQueue import PriorityQueue as PQ
 import networkx as nx
-from runIAC import avgIAC
+from .runIAC import avgIAC
 
 
 def bfs(E, S):
@@ -20,7 +20,7 @@ def bfs(E, S):
     for u in S:
         if u in E:
             if u not in Rs: Rs.append(u)
-            for v in E[u].keys():
+            for v in list(E[u].keys()):
                 if v not in Rs: Rs.append(v)
     return Rs
 
@@ -32,7 +32,7 @@ def findCCs(G, Ep):
 
     # initialize CC
     CCs = dict() # each component is reflection of the number of a component to its members
-    explored = dict(zip(E.nodes(), [False]*len(E)))
+    explored = dict(list(zip(E.nodes(), [False]*len(E))))
     c = 0
     # perform BFS to discover CC
     for node in E:
@@ -40,23 +40,23 @@ def findCCs(G, Ep):
             c += 1
             explored[node] = True
             CCs[c] = [node]
-            component = E[node].keys()
+            component = list(E[node].keys())
             for neighbor in component:
                 if not explored[neighbor]:
                     explored[neighbor] = True
                     CCs[c].append(neighbor)
-                    component.extend(E[neighbor].keys())
+                    component.extend(list(E[neighbor].keys()))
     return CCs
 
 def newGreedyIC (G, k, Ep, R = 20):
 
     S = []
     for i in range(k):
-        print i
+        print(i)
         time2k = time.time()
         scores = {v: 0 for v in G}
         for j in range(R):
-            print j,
+            print(j, end=' ')
             CCs = findCCs(G, Ep)
             for CC in CCs:
                 for v in S:
@@ -65,10 +65,10 @@ def newGreedyIC (G, k, Ep, R = 20):
                 else: # in case CC doesn't have node from S
                     for u in CC:
                         scores[u] += float(len(CC))/R
-        max_v, max_score = max(scores.iteritems(), key = lambda (dk, dv): dv)
+        max_v, max_score = max(iter(scores.items()), key = lambda dk_dv: dk_dv[1])
         S.append(max_v)
-        print
-        print time.time() - time2k
+        print()
+        print(time.time() - time2k)
     return S
 
 # def newGreedyIC(G, k, p=.01):
@@ -155,8 +155,8 @@ if __name__ == "__main__":
     start = time.time()
 
     G = nx.read_gpickle("../../graphs/hep.gpickle")
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     model = "MultiValency"
 
@@ -177,5 +177,5 @@ if __name__ == "__main__":
     I = 1000
 
     S = newGreedyIC(G, 10, Ep)
-    print S
-    print avgIAC(G, S, Ep, I)
+    print(S)
+    print(avgIAC(G, S, Ep, I))

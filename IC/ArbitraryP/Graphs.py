@@ -1,4 +1,4 @@
-from __future__ import division
+
 import networkx as nx
 from Harvester import *
 from Models import *
@@ -14,7 +14,7 @@ def read_graph(filename, directed=False):
         G = nx.DiGraph()
     with open(filename) as f:
         for line in f:
-            e0, e1 = map(int, line.split())
+            e0, e1 = list(map(int, line.split()))
             try:
                 G[e0][e1]["weight"] += 1
             except KeyError:
@@ -28,7 +28,7 @@ def read_graph_without_weights(filename, directed=False):
         G = nx.DiGraph()
     with open(filename) as f:
         for line in f:
-            e0, e1 = map(int, line.split())
+            e0, e1 = list(map(int, line.split()))
             G.add_edge(e0, e1)
     return G
 
@@ -56,7 +56,7 @@ def read_adjacency_list(filename, directed=False):
         G = nx.DiGraph()
     with open(filename) as f:
         for node, line in enumerate(f):
-            neighbors = map(int, line.split())
+            neighbors = list(map(int, line.split()))
             G.add_node(node)
             G.add_edges_from([(node, v) for v in neighbors])
     return G
@@ -67,7 +67,7 @@ def transform_panos_representation():
     counter = 0
     with open("Ep_HEP_Multivalency_with_weights.txt") as f:
         for line in f:
-            edge = map(float, line.split())
+            edge = list(map(float, line.split()))
             u = int(edge[0])
             v = int(edge[1])
             p = edge[2]
@@ -84,9 +84,9 @@ def transform_panos_representation():
         adj_list = dict()
         with open("./GAME_PWs/GAMEtr%s_Sergei.txt" %file_num) as f:
             for line_number, line in enumerate(f):
-                s = " ".join(map(lambda v: str(pano2sergei[int(v)]), line.split())) + os.linesep
+                s = " ".join([str(pano2sergei[int(v)]) for v in line.split()]) + os.linesep
                 adj_list[pano2sergei[line_number]] = s
-        sorted_lines = sorted(adj_list.iteritems(), key = lambda (dk,dv): dk)
+        sorted_lines = sorted(iter(adj_list.items()), key = lambda dk_dv: dk_dv[0])
         with open("./GAME_PWs/GAME%s_Sergei_new.txt" %file_num, "w+") as f:
             for (_, line) in sorted_lines:
                 f.write(line)

@@ -1,4 +1,4 @@
-from __future__ import division
+
 import networkx as nx
 import random
 import multiprocessing
@@ -9,8 +9,8 @@ from Models import Multivalency
 
 
 def runIC(G, S, Ep):
-    activated = dict(zip(G.nodes(), [False]*len(G)))
-    activated.update(dict(zip(S, [True]*len(S))))
+    activated = dict(list(zip(G.nodes(), [False]*len(G))))
+    activated.update(dict(list(zip(S, [True]*len(S)))))
 
     new_activated_nodes = []
     for node in S:
@@ -29,7 +29,8 @@ def runIC(G, S, Ep):
 
     return len(S) + len(new_activated_nodes)
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return runIC(G, S, Ep)
 
 if __name__ == "__main__":
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     # Estimate coverage
     coverage_list = pool.map(getCoverage, ((G, S, Ep) for _ in range(I)))
     average_coverage = sum(coverage_list)/len(coverage_list)
-    print "Harvester: k = %s coverage = %s" %(k, average_coverage)
+    print("Harvester: k = %s coverage = %s" %(k, average_coverage))
 
     ### GDD ###
 
@@ -60,6 +61,6 @@ if __name__ == "__main__":
     # Estimate coverage
     coverage_list = pool.map(getCoverage, ((G, S, Ep) for _ in range(I)))
     average_coverage = sum(coverage_list)/len(coverage_list)
-    print "GDD: k = %s coverage = %s" %(k, average_coverage)
+    print("GDD: k = %s coverage = %s" %(k, average_coverage))
 
     console = []

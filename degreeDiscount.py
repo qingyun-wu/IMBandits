@@ -120,7 +120,7 @@ def degreeDiscountIC2(G, k, p=.01):
         dd[u] = d[u]
         t[u] = 0
     for i in range(k):
-        u, ddv = max(dd.iteritems(), key=lambda (k,v): v)
+        u, ddv = max(iter(dd.items()), key=lambda k_v: k_v[1])
         dd.pop(u)
         S.append(u)
         for v in G[u]:
@@ -142,7 +142,7 @@ def degreeDiscountStar(G,k,Ep):
         scores.add_task(u, score)
     for iteration in range(k):
         u, priority = scores.pop_item()
-        print iteration, -priority
+        print(iteration, -priority)
         S.append(u)
         for v in G[u]:
             if v not in S:

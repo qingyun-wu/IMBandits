@@ -1,7 +1,7 @@
 ''' Implementation of Degree heuristic.
 '''
 
-from __future__ import division
+
 import networkx as nx
 import math, time, random
 from copy import deepcopy
@@ -13,7 +13,8 @@ def updateS (S, Vcur):
     S.append(u)
     Vcur.remove(u)
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return len(runIAC(G, S, Ep))
 
 if __name__ == "__main__":
@@ -21,7 +22,7 @@ if __name__ == "__main__":
 
     dataset = "hep"
     model = "Categories"
-    print dataset, model
+    print(dataset, model)
 
     if model == "MultiValency":
         ep_model = "range"
@@ -31,8 +32,8 @@ if __name__ == "__main__":
         ep_model = "degree"
 
     G = nx.read_gpickle("../../graphs/U%s.gpickle" %dataset)
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     Ep = dict()
     with open("Ep_%s_%s1.txt" %(dataset, ep_model)) as f:
@@ -53,16 +54,16 @@ if __name__ == "__main__":
 
     for T in range(2100, 3000, 100):
         time2T = time.time()
-        print "T:", T
+        print("T:", T)
         Coverages = {0:0}
 
-        print 'Start Initialization for RDM...'
+        print('Start Initialization for RDM...')
         S = []
         Vcur = set(G.nodes())
-        print 'Finished initialization'
+        print('Finished initialization')
 
 
-        print 'Selecting seed set S...'
+        print('Selecting seed set S...')
         time2select = time.time()
         # add first node to S
         updateS(S, Vcur)
@@ -71,7 +72,7 @@ if __name__ == "__main__":
         coverage = sum(Ts)/len(Ts)
         Coverages[len(S)] = coverage
         time2coverage = time.time() - time2Ts
-        print '|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage)
+        print('|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage))
 
         Low = 0
         High = 1
@@ -87,7 +88,7 @@ if __name__ == "__main__":
             coverage = sum(Ts)/len(Ts)
             Coverages[len(S)] = coverage
             time2coverage = time.time() - time2Ts
-            print '|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage)
+            print('|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage))
 
         # find boundary using binary search
         lastS = deepcopy(S) # S gives us solution for k = 1..len(S)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
             coverage = sum(Ts)/len(Ts)
             Coverages[new_length] = coverage
             time2coverage = time.time() - time2Ts
-            print '|S|: %s --> %s nodes | %s sec' %(len(lastS), coverage, time2coverage)
+            print('|S|: %s --> %s nodes | %s sec' %(len(lastS), coverage, time2coverage))
 
             if coverage < T:
                 Low = new_length
@@ -111,14 +112,14 @@ if __name__ == "__main__":
         assert Coverages[High] >= T
         finalS = S[:High]
 
-        print 'Finished selecting seed set S: %s sec' %(time.time() - time2select)
+        print('Finished selecting seed set S: %s sec' %(time.time() - time2select))
         with open(steps_filename, 'a+') as fp:
-                print >>fp, T, len(Coverages) - 1
-        print 'Necessary %s initial nodes to target %s nodes in graph G' %(len(finalS), T)
+                print(T, len(Coverages) - 1, file=fp)
+        print('Necessary %s initial nodes to target %s nodes in graph G' %(len(finalS), T))
         with open(reverse_filename, 'a+') as fp:
-                print >>fp, T, High
+                print(T, High, file=fp)
 
-        print 'Finished seed minimization for T = %s in %s sec' %(T, time.time() - time2T)
-        print '----------------------------------------------'
+        print('Finished seed minimization for T = %s in %s sec' %(T, time.time() - time2T))
+        print('----------------------------------------------')
 
-    print 'Total time: %s' %(time.time() - start)
+    print('Total time: %s' %(time.time() - start))

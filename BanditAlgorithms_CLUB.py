@@ -54,7 +54,7 @@ class CLUBUserStruct(LinUCBUserStruct):
 		return pta
 
 class CLUBAlgorithm:
-	def __init__(self,G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureDic, FeatureScaling, feedback = 'edge',  cluster_init="Erdos-Renyi"):
+	def __init__(self, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureDic, FeatureScaling, feedback = 'edge',  cluster_init="Erdos-Renyi"):
 		self.time = 0
 		self.G = G
 		self.oracle = oracle
@@ -77,7 +77,7 @@ class CLUBAlgorithm:
 		n = len(self.users)
 		#print 'usersNum', n
 		#print len(self.users.keys()), type(self.users.keys())
-		self.userIDSortedList = self.users.keys()
+		self.userIDSortedList = list(self.users.keys())
 		self.userIDSortedList.sort()
 		#print len(self.userIDSortedList)
 		self.SortedUsers = collections.OrderedDict(sorted(self.users.items()))
@@ -111,7 +111,7 @@ class CLUBAlgorithm:
 			self.updateGraphClusters(u, 'False')
 		# print 'Start connected component'
 		N_components, component_list = connected_components(csr_matrix(self.Graph))
-		print 'N_components:',N_components
+		print('N_components:',N_components)
 		# print 'End connected component'
 		self.clusters = component_list
 		for u in S:

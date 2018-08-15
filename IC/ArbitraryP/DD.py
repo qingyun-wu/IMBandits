@@ -1,4 +1,4 @@
-from __future__ import division
+
 from priorityQueue import PriorityQueue as PQ # priority queue
 import networkx as nx
 from runIAC import *
@@ -78,7 +78,8 @@ def frange(begin, end, step):
         yield x
         x += step
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return len(runIAC(G, S, Ep))
 
 if __name__ == '__main__':
@@ -97,8 +98,8 @@ if __name__ == '__main__':
     dataset = "gnu09"
 
     G = nx.read_gpickle("../../graphs/%s.gpickle" %dataset)
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     Ep = dict()
     with open("Ep_%s_%s1.txt" %(dataset, ep_model)) as f:
@@ -129,17 +130,17 @@ if __name__ == '__main__':
 
         time2length = time.time()
 
-        print 'Start finding solution for length = %s' %length
+        print('Start finding solution for length = %s' %length)
         time2S = time.time()
         S = GDD(G, length, Ep)
         time2complete = time.time() - time2S
-        print >>time_file, (time2complete)
-        print >>dbox_time_file, (time2complete)
-        print 'Finish finding S in %s sec...' %(time2complete)
+        print((time2complete), file=time_file)
+        print((time2complete), file=dbox_time_file)
+        print('Finish finding S in %s sec...' %(time2complete))
 
-        print 'Writing S to files...'
-        print >>seeds_filename, json.dumps(S)
-        print >>dbox_seeds_file, json.dumps(S)
+        print('Writing S to files...')
+        print(json.dumps(S), file=seeds_filename)
+        print(json.dumps(S), file=dbox_seeds_file)
 
         # print 'Start calculating coverage...'
         # def map_AvgIAC (it):
@@ -163,13 +164,13 @@ if __name__ == '__main__':
         # with open(DROPBOX + 'plotdata/plot' + FILENAME, 'w+') as fp:
         #     json.dump(l2c, fp)
 
-        print 'Total time for length = %s: %s sec' %(length, time.time() - time2length)
-        print '----------------------------------------------'
+        print('Total time for length = %s: %s sec' %(length, time.time() - time2length))
+        print('----------------------------------------------')
 
     seeds_file.close()
     dbox_seeds_file.close()
     time_file.close()
     dbox_time_file.close()
-    print 'Total time: %s' %(time.time() - start)
+    print('Total time: %s' %(time.time() - start))
 
     console = []

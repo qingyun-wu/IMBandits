@@ -2,7 +2,7 @@
 Independent Arbitrary Cascade (IAC) is a independent cascade model with arbitrary
  propagation probabilities.
 '''
-from __future__ import division
+
 from copy import deepcopy
 import random, multiprocessing, os, math, json
 import networkx as nx
@@ -13,14 +13,14 @@ def uniformEp(G, p = .01):
     Every edge has the same probability p.
     '''
     if type(G) == type(nx.DiGraph()):
-        Ep = dict(zip(G.edges(), [p]*len(G.edges())))
+        Ep = dict(list(zip(G.edges(), [p]*len(G.edges()))))
     elif type(G) == type(nx.Graph()):
         Ep = dict()
         for (u, v) in G.edges():
             Ep[(u, v)] = p
             Ep[(u, v)] = p
     else:
-        raise ValueError, "Provide either nx.Graph or nx.DiGraph object"
+        raise ValueError("Provide either nx.Graph or nx.DiGraph object")
     #Convert Ep into nx.DiGraph type
 
     P = nx.DiGraph()
@@ -47,7 +47,7 @@ def randomEp(G, maxp):
             Ep[(v1,v2)] = p
             Ep[(v2,v1)] = p
     else:
-        raise ValueError, "Provide either nx.Graph or nx.DiGraph object"
+        raise ValueError("Provide either nx.Graph or nx.DiGraph object")
 
     P = nx.DiGraph()
     for key in Ep:
@@ -64,7 +64,7 @@ def random_from_range (G, prange):
     '''
     for p in prange:
         if p > 1:
-            raise ValueError, "Propagation probability inside range should be <= 1"
+            raise ValueError("Propagation probability inside range should be <= 1")
     Ep = dict()
     if type(G) == type(nx.DiGraph()):
         for v1,v2 in G.edges():
@@ -95,13 +95,13 @@ def degree_categories(G, prange):
     '''
     for p in prange:
         if p > 1:
-            raise ValueError, "Propagation probability inside range should be <= 1"
+            raise ValueError("Propagation probability inside range should be <= 1")
     Ep = dict()
 
     d = {v: sum([G[v][u]["weight"] for u in G[v]]) for v in G}
-    sorted_d = chunks(sorted(d.iteritems(), key = lambda (_, degree): degree), len(prange))
+    sorted_d = chunks(sorted(iter(d.items()), key = lambda __degree: __degree[1]), len(prange))
     sorted_p = sorted(prange)
-    categories = zip(sorted_p, sorted_d)
+    categories = list(zip(sorted_p, sorted_d))
     dp = dict()
     for c in categories:
         p, nodes = c
@@ -218,7 +218,7 @@ def findCC(G, Ep):
 
     # initialize CC
     CC = dict() # number of a component to its members
-    explored = dict(zip(E.nodes(), [False]*len(E)))
+    explored = dict(list(zip(E.nodes(), [False]*len(E))))
     c = 0
     # perform BFS to discover CC
     for node in E:
@@ -226,17 +226,17 @@ def findCC(G, Ep):
             c += 1
             explored[node] = True
             CC[c] = [node]
-            component = E[node].keys()
+            component = list(E[node].keys())
             for neighbor in component:
                 if not explored[neighbor]:
                     explored[neighbor] = True
                     CC[c].append(neighbor)
-                    component.extend(E[neighbor].keys())
+                    component.extend(list(E[neighbor].keys()))
     return CC
 
 def findL(CCs, T):
     # find top components that can reach T activated nodes
-    sortedCCs = sorted([(len(dv), dk) for (dk, dv) in CCs.iteritems()], reverse=True)
+    sortedCCs = sorted([(len(dv), dk) for (dk, dv) in CCs.items()], reverse=True)
     cumsum = 0 # sum of top components
     L = 0 # current number of CC that achieve T
     # find L first
@@ -251,7 +251,7 @@ def findCCs_size_distribution(G, Ep, T):
     CCs = findCC(G, Ep)
     L, sortedCCs = findL(CCs, T)
     from itertools import groupby
-    histogram = [(s, len(list(group))) for (s, group) in groupby(sortedCCs, key = lambda (size, _): size)]
+    histogram = [(s, len(list(group))) for (s, group) in groupby(sortedCCs, key = lambda size__: size__[0])]
 
     bluedots = 1
     acc_size = 0
@@ -299,8 +299,8 @@ if __name__ == '__main__':
     # print 'Wrote graph G'
     # print time.time() - start
     G = nx.read_gpickle("../../graphs/hep.gpickle")
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     DROPBOX = "/home/sergey/Dropbox/Influence Maximization/"
 

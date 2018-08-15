@@ -23,7 +23,7 @@ NodeList = pickle.load(open( './Small_NodeList.list', "rb" ))
 NodeTheta = pickle.load(open( './Final_NodeTheta.dic', "rb" ))
 
 EdgeFeatureDic = pickle.load( open( './Small_Final_Normalized_edgeFeatures_uniform.dic', "rb" ))
-print len(EdgeFeatureDic), len(NodeTheta)
+print(len(EdgeFeatureDic), len(NodeTheta))
 dimension = 7
 PDic = {}
 

@@ -1,9 +1,10 @@
-from __future__ import division
+
 from runIAC import runIAC
 import networkx as nx
 import json, time, multiprocessing
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return len(runIAC(G, S, Ep))
 
 if __name__ == "__main__":
@@ -16,7 +17,7 @@ if __name__ == "__main__":
     dataset = file_split[2]
     idx = file_split[3].find(".txt")
     model = file_split[3][:idx]
-    print model, dataset, algo
+    print(model, dataset, algo)
 
     output_filename = "Spread_%s_%s_%s.txt" %(algo, dataset, model)
 
@@ -30,7 +31,7 @@ if __name__ == "__main__":
 
     #define G
     G = nx.read_gpickle("../../graphs/U%s.gpickle" %dataset)
-    print 'Read graph G'
+    print('Read graph G')
 
     # define Ep
     if model == "MultiValency":
@@ -53,13 +54,13 @@ if __name__ == "__main__":
     with open(seeds_filename) as fp:
         for line in fp:
             S = json.loads(line)
-            print len(S),
+            print(len(S), end=' ')
             Ts = pool.map(getCoverage, ((G, S, Ep) for _ in range(I)))
             T = sum(Ts)/len(Ts)
-            print T
+            print(T)
             k = len(S)
             with open(spread_filename, "a+") as fp:
-                print >>fp, k, " ", T
+                print(k, " ", T, file=fp)
 
 
     console = []

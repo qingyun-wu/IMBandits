@@ -1,4 +1,4 @@
-from __future__ import division
+
 import networkx as nx
 import json, time, random, os, math
 from Harvester import make_possible_world
@@ -22,7 +22,7 @@ def write_PWs(edge_file, MC, output_file):
         with open(edge_file) as f:
             with open(output_file + str(mc) + ".txt", "w+") as g:
                 for line in f:
-                    u,v,p = map(float, line.split())
+                    u,v,p = list(map(float, line.split()))
                     if random.random() <= p:
                         g.write("%d %d %s\n" %(u,v,p))
 
@@ -52,10 +52,10 @@ def cleanGraph(infile, outfile, model="no_model"):
         track = 1
         for i, line in enumerate(f):
             if i == track*100000:
-                print 'Processed %s edges' %i
+                print('Processed %s edges' %i)
                 track += 1
             try:
-                u, v, p = map(float, line.split())
+                u, v, p = list(map(float, line.split()))
             except:
                 continue
             if u not in old2new:
@@ -81,7 +81,7 @@ def cleanGraph(infile, outfile, model="no_model"):
                 elif model == "uniform":
                     p = 0.1
                 else:
-                    raise ValueError, 'Please provide appropriate model (wc, multivalency, random, uniform, no_model)'
+                    raise ValueError('Please provide appropriate model (wc, multivalency, random, uniform, no_model)')
                 content.append("%s %s %s" %(old2new[u], old2new[v], p))
 
 
@@ -92,7 +92,7 @@ def cleanGraph(infile, outfile, model="no_model"):
         # write to file
         with open(outfile, "w+") as g:
             g.write("\n".join(content))
-    print 'Total time:', time.time() - time2write
+    print('Total time:', time.time() - time2write)
 
 def get_data_for_spine(sn_in, act_in, sn_out, act_out):
     '''
@@ -109,10 +109,10 @@ def get_data_for_spine(sn_in, act_in, sn_out, act_out):
         track = 1
         for i, line in enumerate(f):
             if i == track*100000:
-                print 'Processed %s edges' %i
+                print('Processed %s edges' %i)
                 track += 1
             try:
-                u, v = map(int, line.split())
+                u, v = list(map(int, line.split()))
             except:
                 continue
             if u not in old2new:
@@ -125,7 +125,7 @@ def get_data_for_spine(sn_in, act_in, sn_out, act_out):
 
     with open(act_in) as f, open("./tmp2.txt", "w+") as g:
         for line in f:
-            d = map(int, line.split())
+            d = list(map(int, line.split()))
             if len(d) == 2:
                 if d[0] in old2new:
                     g.write("\t%s\t%s\n" %(old2new[d[0]], d[1]))
@@ -136,7 +136,7 @@ def get_data_for_spine(sn_in, act_in, sn_out, act_out):
 
     with open("./tmp.txt", "w+") as g:
         g.write("\n".join(content))
-    print '-----------------------------'
+    print('-----------------------------')
 
     with open("./tmp2.txt") as f, open(act_out, "w+") as g:
         for line in f:
@@ -168,7 +168,7 @@ def prune_data_for_spine(sn_in, sn_out, act_in, act_out, N):
     nodes = set()
     with open(sn_in) as f, open(sn_out, "w+") as g:
         for line in f:
-            d = map(int, line.split())
+            d = list(map(int, line.split()))
             M = len(nodes)
             if M < N - 1:
                 nodes.add(d[0])
@@ -184,7 +184,7 @@ def prune_data_for_spine(sn_in, sn_out, act_in, act_out, N):
 
     with open(act_in) as f, open(act_out, "w+") as g:
         for line in f:
-            d = map(int, line.split())
+            d = list(map(int, line.split()))
             if d[0] in nodes and d[1] in nodes:
                 g.write(line)
 

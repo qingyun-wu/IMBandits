@@ -8,8 +8,8 @@ import math
 
 import networkx as nx
 
-from degreeDiscount import degreeDiscountIC
-from IC.IC import runIC
+from .degreeDiscount import degreeDiscountIC
+from .IC.IC import runIC
 
 
 def binarySearchBoundary(G, k, Tsize, targeted_size, step, p, iterations):
@@ -27,7 +27,7 @@ def binarySearchBoundary(G, k, Tsize, targeted_size, step, p, iterations):
         Tsize[k] = avg
     # check values of Tsize in between last 2 calculated steps
     while stepk != 1:
-        print k, stepk, Tsize[k]
+        print(k, stepk, Tsize[k])
         if Tsize[k] >= targeted_size:
             stepk = -int(math.ceil(float(abs(stepk))/2))
         else:
@@ -69,7 +69,7 @@ def spreadDegreeDiscount(G, targeted_size, step=1, p=.01, iterations=200):
             avg += float(len(T))/R
         Tsize[k] = avg
 
-        print k, Tsize[k]
+        print(k, Tsize[k])
 
     # binary search for optimal solution
     return binarySearchBoundary(G, k, Tsize, targeted_size, step, p, iterations)
@@ -83,16 +83,16 @@ if __name__ == '__main__':
     with open('graphdata/../graphdata/hep.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u, v, weight=1)
-    print 'Built graph G'
-    print time.time() - start
+    print('Built graph G')
+    print(time.time() - start)
 
     targeted_size = 200
     S, Tsize = spreadDegreeDiscount(G, targeted_size, step=100)
-    print time.time() - start
+    print(time.time() - start)
 
     console = []

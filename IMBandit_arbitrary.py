@@ -25,7 +25,7 @@ class simulateOnlineData:
 		return
 
 	def batchRecord(self, iter_):
-		print "Iteration %d"%iter_, " Elapsed time", datetime.datetime.now() - self.startTime
+		print("Iteration %d"%iter_, " Elapsed time", datetime.datetime.now() - self.startTime)
 
 	def runAlgorithms(self, algorithms):
 		# get cotheta for each user
@@ -38,7 +38,7 @@ class simulateOnlineData:
 		BatchCumlateRegret = {}
 		AlgRegret = {}
 
-		for alg_name, alg in algorithms.items():
+		for alg_name, alg in list(algorithms.items()):
 			AlgRegret[alg_name] = []
 			BatchCumlateRegret[alg_name] = []
 			
@@ -46,7 +46,7 @@ class simulateOnlineData:
 			optS = self.oracle(self.G, self.seed_size, self.Pp)
 			optimal_reward, live_nodes, live_edges = self.get_reward(G, optS, Pp)
 #			print 'optimal' ,optimal_reward
-			for alg_name, alg in algorithms.items(): 
+			for alg_name, alg in list(algorithms.items()): 
 				S, Ep = alg.decide(iter_) #S is the selected seed nodes set.
 				reward, live_nodes, live_edges = self.get_reward(G, S, Ep)
 #				print reward
@@ -62,15 +62,15 @@ class simulateOnlineData:
 			if iter_%self.batchSize == 0:
 				self.batchRecord(iter_)
 				tim_.append(iter_)
-				for alg_name in algorithms.iterkeys():
+				for alg_name in algorithms.keys():
 					BatchCumlateRegret[alg_name].append(sum(AlgRegret[alg_name]))
 			
 		if (self.plot==True): 
 			# plot the results	
 			f, axa = plt.subplots(1, sharex=True)
-			for alg_name in algorithms.iterkeys():	
+			for alg_name in algorithms.keys():	
 				axa.plot(tim_, BatchCumlateRegret[alg_name],label = alg_name)
-				print '%s: %.2f' % (alg_name, BatchCumlateRegret[alg_name][-1])
+				print('%s: %.2f' % (alg_name, BatchCumlateRegret[alg_name][-1]))
 			axa.legend(loc='upper left',prop={'size':9})
 			axa.set_xlabel("Iteration")
 			axa.set_ylabel("Regret")
@@ -86,13 +86,13 @@ if __name__ == '__main__':
 	with open('graphdata/../graphdata/hep.txt') as f:
 		n, m = f.readline().split()
 		for line in f:
-			u, v = map(int, line.split())
+			u, v = list(map(int, line.split()))
 			try:
 				G[u][v]['weight'] += 1
 			except:
 				G.add_edge(u,v, weight=1)
-	print 'Built graph G'
-	print time.time() - start, 's'
+	print('Built graph G')
+	print(time.time() - start, 's')
 
 #	Pp = weightedEp(G)
 	Pp = randomEp(G,0.2)

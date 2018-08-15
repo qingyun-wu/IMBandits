@@ -1,4 +1,4 @@
-from __future__ import division
+
 from copy import deepcopy
 import time, random, operator, os, json, heapq
 import networkx as nx
@@ -15,7 +15,7 @@ def findCC(G, Ep):
 
     # initialize CC
     CC = dict() # each component is reflection os the number of a component to its members
-    explored = dict(zip(E.nodes(), [False]*len(E)))
+    explored = dict(list(zip(E.nodes(), [False]*len(E))))
     c = 0
     # perform BFS to discover CC
     for node in E:
@@ -23,17 +23,17 @@ def findCC(G, Ep):
             c += 1
             explored[node] = True
             CC[c] = [node]
-            component = E[node].keys()
+            component = list(E[node].keys())
             for neighbor in component:
                 if not explored[neighbor]:
                     explored[neighbor] = True
                     CC[c].append(neighbor)
-                    component.extend(E[neighbor].keys())
+                    component.extend(list(E[neighbor].keys()))
     return CC
 
 def findL(CCs, T):
     # find top components that can reach T activated nodes
-    sortedCCs = sorted([(len(dv), dk) for (dk, dv) in CCs.iteritems()], reverse=True)
+    sortedCCs = sorted([(len(dv), dk) for (dk, dv) in CCs.items()], reverse=True)
     cumsum = 0 # sum of top components
     L = 0 # current number of CC that achieve T
     # find L first
@@ -122,7 +122,7 @@ def getScores(G, Ep, T, min_size):
 
     # initialize CC
     CCs = dict() # number of a component to its members
-    explored = dict(zip(E.nodes(), [False]*len(E)))
+    explored = dict(list(zip(E.nodes(), [False]*len(E))))
     num = 0 # number of CC
     qualified_nodes = []
     qualified_components = []
@@ -136,20 +136,20 @@ def getScores(G, Ep, T, min_size):
                 explored[node] = True
                 CCs[num] = [node]
                 try:
-                    component = E[node].keys()
+                    component = list(E[node].keys())
                 except KeyError:
-                    print 'CC:', node
+                    print('CC:', node)
                 for neighbor in component:
                     if not explored[neighbor]:
                         explored[neighbor] = True
                         try:
                             CCs[num].append(neighbor)
                         except KeyError:
-                            print 'CCs:', num
+                            print('CCs:', num)
                         try:
-                            component.extend(E[neighbor].keys())
+                            component.extend(list(E[neighbor].keys()))
                         except KeyError:
-                            print "E_neighbor:", neighbor
+                            print("E_neighbor:", neighbor)
 
                 heapq.heappush(CCs_sizes, -len(CCs[num]))
                 # assign scores
@@ -165,7 +165,7 @@ def getScores(G, Ep, T, min_size):
                         qualified_nodes.append(v1)
                         scores[v1] += weighted_score
         except KeyError:
-            print 'Explored:', node
+            print('Explored:', node)
             raise
 
     # normalize scores
@@ -185,7 +185,7 @@ def getScores(G, Ep, T, min_size):
     return scores, L
 
 def updateScores(scores_copied, S, Ep):
-    maxk, maxv = max(scores_copied.iteritems(), key=lambda (dk, dv): dv) # top node in the order
+    maxk, maxv = max(iter(scores_copied.items()), key=lambda dk_dv: dk_dv[1]) # top node in the order
     S.append(maxk)
     scores_copied.pop(maxk)
     for v in G[maxk]:
@@ -207,7 +207,8 @@ def mapAvgSize (args):
     G, S, Ep, I = args
     return avgIAC(G, S, Ep, I)
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return len(runIAC(G, S, Ep))
 
 def mapReverseCCWP (args):
@@ -219,7 +220,7 @@ if __name__ == "__main__":
 
     dataset = "gnu09"
     model = "MultiValency"
-    print dataset, model
+    print(dataset, model)
 
     if model == "MultiValency":
         ep_model = "range"
@@ -229,8 +230,8 @@ if __name__ == "__main__":
         ep_model = "degree"
 
     G = nx.read_gpickle("../../graphs/U%s.gpickle" %dataset)
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     Ep = dict()
     with open("Ep_%s_%s1.txt" %(dataset, ep_model)) as f:
@@ -250,11 +251,11 @@ if __name__ == "__main__":
     pool = multiprocessing.Pool(processes = None)
 
     for T in range(100, 2100, 100):
-        print "T:", T
+        print("T:", T)
         best_S = []
         min_lenS = len(G)
 
-        print 'Preprocessing to find minimal size of CC...'
+        print('Preprocessing to find minimal size of CC...')
         time2preprocess = time.time()
         min_size = len(G)
         # find min_size to select CC within
@@ -264,17 +265,17 @@ if __name__ == "__main__":
             LCC_size = sortedCC[L-1][0]
             if LCC_size < min_size:
                 min_size = LCC_size
-        print 'Min size:', min_size
-        print 'Finished preprocessing in %s sec' %(time.time() - time2preprocess)
+        print('Min size:', min_size)
+        print('Finished preprocessing in %s sec' %(time.time() - time2preprocess))
 
-        print 'Start mapping...'
+        print('Start mapping...')
         time2map = time.time()
         result = pool.map(mapReverseCCWP, ((G, Ep, T, min_size) for i in range(R))) # result is [(scores1, L1), (scores2, L2), ...]
-        print 'Finished mapping in %s sec' %(time.time() - time2map)
+        print('Finished mapping in %s sec' %(time.time() - time2map))
 
-        print 'Start reducing scores...'
+        print('Start reducing scores...')
         time2reduce = time.time()
-        scores = dict(zip(G.nodes(), [0]*len(G)))
+        scores = dict(list(zip(G.nodes(), [0]*len(G))))
         maxL = -1
         minL = float("Inf")
         avgL = 0
@@ -284,14 +285,14 @@ if __name__ == "__main__":
                 maxL = L
             if L < minL:
                 minL = L
-            for (node, score) in Sc.iteritems():
+            for (node, score) in Sc.items():
                 scores[node] += score
-        print 'Finished reducing in %s sec' %(time.time() - time2reduce)
-        print 'avgL', avgL
-        print 'minL', minL
-        print 'maxL', maxL
+        print('Finished reducing in %s sec' %(time.time() - time2reduce))
+        print('avgL', avgL)
+        print('minL', minL)
+        print('maxL', maxL)
 
-        print 'Start selecting seed set S...'
+        print('Start selecting seed set S...')
         time2select = time.time()
 
         # select first top-L nodes with penalization
@@ -309,7 +310,7 @@ if __name__ == "__main__":
         coverage = sum(Ts)/len(Ts)
         Coverages[len(S)] = coverage
         time2coverage = time.time() - time2Ts
-        print '|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage)
+        print('|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage))
 
         # find Low and High
         if coverage > T:
@@ -326,7 +327,7 @@ if __name__ == "__main__":
                 coverage = sum(Ts)/len(Ts)
                 Coverages[len(S)] = coverage
                 time2coverage = time.time() - time2Ts
-                print '|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage)
+                print('|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage))
 
         # find boundary using binary search
         lastS = deepcopy(S) # S gives us solution for k = 1..len(S)
@@ -339,7 +340,7 @@ if __name__ == "__main__":
             coverage = sum(Ts)/len(Ts)
             Coverages[new_length] = coverage
             time2coverage = time.time() - time2Ts
-            print '|S|: %s --> %s nodes | %s sec' %(len(lastS), coverage, time2coverage)
+            print('|S|: %s --> %s nodes | %s sec' %(len(lastS), coverage, time2coverage))
 
             if coverage < T:
                 Low = new_length
@@ -351,17 +352,17 @@ if __name__ == "__main__":
         finalS = S[:High]
 
         # print finalS
-        print "Number of binary steps:", len(Coverages) - 1
+        print("Number of binary steps:", len(Coverages) - 1)
         with open(steps_filename, 'a+') as fp:
-            print >>fp, T, len(Coverages) - 1
-        print 'Necessary %s initial nodes to target %s nodes in graph G' %(len(finalS), T)
+            print(T, len(Coverages) - 1, file=fp)
+        print('Necessary %s initial nodes to target %s nodes in graph G' %(len(finalS), T))
         with open(reverse_filename, 'a+') as fp:
-            print >>fp, T, High
+            print(T, High, file=fp)
 
 
-        print 'Finished seed minimization for T = %s in %s sec' %(T, time.time() - time2select)
-        print '----------------------------------------------'
+        print('Finished seed minimization for T = %s in %s sec' %(T, time.time() - time2select))
+        print('----------------------------------------------')
 
-    print 'Total time: %s sec' %(time.time() - start)
+    print('Total time: %s sec' %(time.time() - start))
 
     console = []

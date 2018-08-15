@@ -3,7 +3,7 @@
 [1] -- Scalable Influence Maximization for Prevalent Viral Marketing in Large-Scale Social Networks.
 '''
 
-from __future__ import division
+
 import networkx as nx
 import math, time
 from copy import deepcopy
@@ -16,7 +16,7 @@ def updateAP(ap, S, PMIIAv, PMIIA_MIPv, Ep):
     PMIIAv is rooted at v.
     '''
     # going from leaves to root
-    sorted_MIPs = sorted(PMIIA_MIPv.iteritems(), key = lambda (_, MIP): len(MIP), reverse = True)
+    sorted_MIPs = sorted(iter(PMIIA_MIPv.items()), key = lambda __MIP: len(__MIP[1]), reverse = True)
     for u, _ in sorted_MIPs:
         if u in S:
             ap[(u, PMIIAv)] = 1
@@ -32,7 +32,7 @@ def updateAP(ap, S, PMIIAv, PMIIA_MIPv, Ep):
 
 def updateAlpha(alpha, v, S, PMIIAv, PMIIA_MIPv, Ep, ap):
     # going from root to leaves
-    sorted_MIPs =  sorted(PMIIA_MIPv.iteritems(), key = lambda (_, MIP): len(MIP))
+    sorted_MIPs =  sorted(iter(PMIIA_MIPv.items()), key = lambda __MIP1: len(__MIP1[1]))
     for u, mip in sorted_MIPs:
         if u == v:
             alpha[(PMIIAv, u)] = 1
@@ -138,7 +138,7 @@ def computePMIIA(G, ISv, v, theta, S, Ep):
     return PMIIA, PMIIA_MIP
 
 def updateS (S, IncInf, alpha, ap, IS, PMIOA_MIP, PMIIA_MIP):
-    u, _ = max(IncInf.iteritems(), key = lambda (dk, dv): dv)
+    u, _ = max(iter(IncInf.items()), key = lambda dk_dv: dk_dv[1])
     IncInf.pop(u) # exclude node u for next iterations
     PMIOA[u], PMIOA_MIP[u] = computePMIOA(G, u, theta, S, Ep)
     for v in PMIOA[u]:
@@ -160,7 +160,8 @@ def updateS (S, IncInf, alpha, ap, IS, PMIOA_MIP, PMIIA_MIP):
                 if w not in S:
                     IncInf[w] += alpha[(PMIIA[v], w)]*(1 - ap[(w, PMIIA[v])])
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return len(runIAC(G, S, Ep))
 
 if __name__ == "__main__":
@@ -168,7 +169,7 @@ if __name__ == "__main__":
 
     dataset = "hep"
     model = "Categories"
-    print dataset, model
+    print(dataset, model)
 
     if model == "MultiValency":
         ep_model = "range"
@@ -178,8 +179,8 @@ if __name__ == "__main__":
         ep_model = "degree"
 
     G = nx.read_gpickle("../../graphs/%s.gpickle" %dataset)
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     Ep = dict()
     with open("Ep_%s_%s1.txt" %(dataset, ep_model)) as f:
@@ -201,12 +202,12 @@ if __name__ == "__main__":
 
     for T in range(2100, 3000, 100):
         time2T = time.time()
-        print "T:", T
+        print("T:", T)
         Coverages = {0:0}
 
-        print 'Start Initialization for PMIA...'
+        print('Start Initialization for PMIA...')
         S = []
-        IncInf = dict(zip(G.nodes(), [0]*len(G)))
+        IncInf = dict(list(zip(G.nodes(), [0]*len(G))))
         PMIIA = dict() # node to tree
         PMIOA = dict()
         PMIIA_MIP = dict() # node to MIPs (dict)
@@ -222,10 +223,10 @@ if __name__ == "__main__":
             updateAlpha(alpha, v, S, PMIIA[v], PMIIA_MIP[v], Ep, ap)
             for u in PMIIA[v]:
                 IncInf[u] += alpha[(PMIIA[v], u)]*(1 - ap[(u, PMIIA[v])])
-        print 'Finished initialization'
+        print('Finished initialization')
 
 
-        print 'Selecting seed set S...'
+        print('Selecting seed set S...')
         time2select = time.time()
         # add first node to S
         updateS(S, IncInf, alpha, ap, IS, PMIOA_MIP, PMIIA_MIP)
@@ -234,7 +235,7 @@ if __name__ == "__main__":
         coverage = sum(Ts)/len(Ts)
         Coverages[len(S)] = coverage
         time2coverage = time.time() - time2Ts
-        print '|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage)
+        print('|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage))
 
         Low = 0
         High = 1
@@ -250,7 +251,7 @@ if __name__ == "__main__":
             coverage = sum(Ts)/len(Ts)
             Coverages[len(S)] = coverage
             time2coverage = time.time() - time2Ts
-            print '|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage)
+            print('|S|: %s --> %s nodes | %s sec' %(len(S), coverage, time2coverage))
 
         # find boundary using binary search
         lastS = deepcopy(S) # S gives us solution for k = 1..len(S)
@@ -263,7 +264,7 @@ if __name__ == "__main__":
             coverage = sum(Ts)/len(Ts)
             Coverages[new_length] = coverage
             time2coverage = time.time() - time2Ts
-            print '|S|: %s --> %s nodes | %s sec' %(len(lastS), coverage, time2coverage)
+            print('|S|: %s --> %s nodes | %s sec' %(len(lastS), coverage, time2coverage))
 
             if coverage < T:
                 Low = new_length
@@ -274,14 +275,14 @@ if __name__ == "__main__":
         assert Coverages[High] >= T
         finalS = S[:High]
 
-        print 'Finished selecting seed set S: %s sec' %(time.time() - time2select)
+        print('Finished selecting seed set S: %s sec' %(time.time() - time2select))
         with open(steps_filename, 'a+') as fp:
-                print >>fp, T, len(Coverages) - 1
-        print 'Necessary %s initial nodes to target %s nodes in graph G' %(len(finalS), T)
+                print(T, len(Coverages) - 1, file=fp)
+        print('Necessary %s initial nodes to target %s nodes in graph G' %(len(finalS), T))
         with open(reverse_filename, 'a+') as fp:
-                print >>fp, T, High
+                print(T, High, file=fp)
 
-        print 'Finished seed minimization for T = %s in %s sec' %(T, time.time() - time2T)
-        print '----------------------------------------------'
+        print('Finished seed minimization for T = %s in %s sec' %(T, time.time() - time2T))
+        print('----------------------------------------------')
 
-    print 'Total time: %s' %(time.time() - start)
+    print('Total time: %s' %(time.time() - start))

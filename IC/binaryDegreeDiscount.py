@@ -4,8 +4,8 @@ import math
 
 import networkx as nx
 
-from degreeDiscount import degreeDiscountIC
-from IC.IC import avgSize
+from .degreeDiscount import degreeDiscountIC
+from .IC.IC import avgSize
 
 
 def binaryDegreeDiscount (G, tsize, p=.01, a=0.38, step=5, iterations=200):
@@ -29,7 +29,7 @@ def binaryDegreeDiscount (G, tsize, p=.01, a=0.38, step=5, iterations=200):
     Tspread[k0] = t
     # find bound (lower or upper) of total spread
     k = k0
-    print k, step, Tspread[k]
+    print(k, step, Tspread[k])
     if t >= tsize:
         # find the value of k that doesn't spread influence up to tsize nodes
         step *= -1
@@ -41,7 +41,7 @@ def binaryDegreeDiscount (G, tsize, p=.01, a=0.38, step=5, iterations=200):
             S = degreeDiscountIC(G, k, p)
             t = avgSize(G, S, p, iterations)
             Tspread[k] = t
-            print k, step, Tspread[k]
+            print(k, step, Tspread[k])
     else:
         # find the value of k that spreads influence up to tsize nodes
         while t < tsize:
@@ -49,7 +49,7 @@ def binaryDegreeDiscount (G, tsize, p=.01, a=0.38, step=5, iterations=200):
             S = degreeDiscountIC(G, k, p)
             t = avgSize(G, S, p, iterations)
             Tspread[k] = t
-            print k, step, Tspread[k]
+            print(k, step, Tspread[k])
 
     if Tspread[k] < Tspread[k-step]:
         k -= step
@@ -67,7 +67,7 @@ def binaryDegreeDiscount (G, tsize, p=.01, a=0.38, step=5, iterations=200):
         if k not in Tspread:
             S = degreeDiscountIC(G, k, p)
             Tspread[k] = avgSize(G, S, p, iterations)
-        print k, stepk, Tspread[k]
+        print(k, stepk, Tspread[k])
 
     return S, Tspread
 
@@ -80,16 +80,16 @@ if __name__ == '__main__':
     with open('graphdata/../graphdata/hep.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u, v, weight=1)
-    print 'Built graph G'
-    print time.time() - start
+    print('Built graph G')
+    print(time.time() - start)
 
     tsize = 200
     S, Tsize = binaryDegreeDiscount(G, tsize, step=5)
-    print 'Necessary %s initial nodes to target %s nodes in graph G' %(len(S), tsize)
-    print time.time() - start
+    print('Necessary %s initial nodes to target %s nodes in graph G' %(len(S), tsize))
+    print(time.time() - start)
     console = []

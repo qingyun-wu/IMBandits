@@ -1,4 +1,4 @@
-from __future__ import division
+
 import networkx as nx
 import random, multiprocessing, json
 from runIAC import runIAC
@@ -12,11 +12,12 @@ def getDegreeS (G, k):
     d = dict()
     for u in G:
         d[u] = sum([G[u][v]["weight"] for v in G[u]])
-    [nodes, _] = zip(*nlargest(k, d.iteritems(), key = lambda (dk,dv): dv))
+    [nodes, _] = list(zip(*nlargest(k, iter(d.items()), key = lambda dk_dv: dk_dv[1])))
     S = list(nodes)
     return S
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return len(runIAC(G, S, Ep))
 
 if __name__ == "__main__":
@@ -25,7 +26,7 @@ if __name__ == "__main__":
 
     dataset = "gnu09"
     model = "Categories"
-    print dataset, model
+    print(dataset, model)
 
     if model == "MultiValency":
         ep_model = "range"
@@ -35,8 +36,8 @@ if __name__ == "__main__":
         ep_model = "degree"
 
     G = nx.read_gpickle("../../graphs/U%s.gpickle" %dataset)
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     Ep = dict()
     with open("Ep_%s_%s1.txt" %(dataset, ep_model)) as f:
@@ -62,25 +63,25 @@ if __name__ == "__main__":
 
         time2length = time.time()
 
-        print 'Start finding solution for length = %s' %length
+        print('Start finding solution for length = %s' %length)
         time2S = time.time()
         S = getDegreeS(G, length)
         time2complete = time.time() - time2S
         with open("%s" %time_filename, "a+") as time_file:
-            print >>time_file, (time2complete)
+            print((time2complete), file=time_file)
         with open("%s/%s" %(DROPBOX_FOLDER, time_filename), "a+") as dbox_time_file:
-            print >>dbox_time_file, (time2complete)
-        print 'Finish finding S in %s sec...' %(time2complete)
+            print((time2complete), file=dbox_time_file)
+        print('Finish finding S in %s sec...' %(time2complete))
 
-        print 'Writing S to files...'
+        print('Writing S to files...')
         with open("%s" %seeds_filename, "a+") as seeds_file:
-            print >>seeds_file, json.dumps(S)
+            print(json.dumps(S), file=seeds_file)
         with open("%s/%s" %(DROPBOX_FOLDER, seeds_filename), "a+") as dbox_seeds_file:
-            print >>dbox_seeds_file, json.dumps(S)
+            print(json.dumps(S), file=dbox_seeds_file)
 
-        print 'Total time for length = %s: %s sec' %(length, time.time() - time2length)
-        print '----------------------------------------------'
+        print('Total time for length = %s: %s sec' %(length, time.time() - time2length))
+        print('----------------------------------------------')
 
-    print 'Total time: %s' %(time.time() - start)
+    print('Total time: %s' %(time.time() - start))
 
     console = []

@@ -3,7 +3,7 @@ of size k using priority queues
 '''
 __author__ = 'ivanovsergey'
 
-from priorityQueue import PriorityQueue as PQ # priority queue class
+from .priorityQueue import PriorityQueue as PQ # priority queue class
 
 def _sumDist (G, S, no):
     ''' Compute cumulative distance from node to set S
@@ -49,9 +49,9 @@ def representativeNodes(G, k, metric=1):
 
     # initialize S with furthest vertices
     try:
-        u,v,d = max(G.edges(data=True), key=lambda (u, v, d): d['weight'])
+        u,v,d = max(G.edges(data=True), key=lambda u_v_d: u_v_d[2]['weight'])
     except KeyError:
-        raise KeyError, 'Most likely you have no weight attribute'
+        raise KeyError('Most likely you have no weight attribute')
     S.extend([u,v])
 
     # compute distances from each node in G to S
@@ -68,7 +68,7 @@ def representativeNodes(G, k, metric=1):
         S.append(u) # append that node to S
 
         # only increase distance for nodes that are connected to u
-        for v in G[u].keys():
+        for v in list(G[u].keys()):
             if v not in S: # add only remained nodes
                 [priority, count, task] = S_dist.entry_finder[v] # finds distance for the previous step
                 try:
@@ -77,7 +77,7 @@ def representativeNodes(G, k, metric=1):
                     elif metric == 2:
                         S_dist.add_task(v, max(priority, -G[u][v]['weight'])) # update min distance to the set S
                 except:
-                    raise u,v, "These are vertices that caused the problem"
+                    raise u(v).with_traceback("These are vertices that caused the problem")
 
     # extract objective value of the chosen set
     if metric == 1:

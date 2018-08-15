@@ -9,7 +9,7 @@ References:
 Kempe et al. "Maximizing the spread of influence through a social network" Claim 2.3
 '''
 
-from __future__ import division
+
 
 import random, operator, time, os
 from heapq import nlargest
@@ -25,7 +25,7 @@ def CC_heuristic (G, k, p, R=20):
      Output:
      S -- seed set (list of tuples: for each tuple first argument is a node, second argument is its score)
     '''
-    scores = dict(zip(G.nodes(), [0]*len(G))) # initialize scores
+    scores = dict(list(zip(G.nodes(), [0]*len(G)))) # initialize scores
     start = time.time()
     for it in range(R):
         # remove blocked edges from graph G
@@ -35,7 +35,7 @@ def CC_heuristic (G, k, p, R=20):
 
         # initialize CC
         CC = dict() # each component is reflection os the number of a component to its members
-        explored = dict(zip(E.nodes(), [False]*len(E)))
+        explored = dict(list(zip(E.nodes(), [False]*len(E))))
         c = 0
         # perform BFS to discover CC
         for node in E:
@@ -43,15 +43,15 @@ def CC_heuristic (G, k, p, R=20):
                 c += 1
                 explored[node] = True
                 CC[c] = [node]
-                component = E[node].keys()
+                component = list(E[node].keys())
                 for neighbor in component:
                     if not explored[neighbor]:
                         explored[neighbor] = True
                         CC[c].append(neighbor)
-                        component.extend(E[neighbor].keys())
+                        component.extend(list(E[neighbor].keys()))
 
         # add score only to top components
-        topCC = nlargest(k, CC.iteritems(), key= lambda (dk,dv): len(dv))
+        topCC = nlargest(k, iter(CC.items()), key= lambda dk_dv: len(dk_dv[1]))
         for (c, component) in topCC:
             # print c, len(component)
             weighted_score = 1.0/len(component)**(.5)
@@ -66,6 +66,6 @@ def CC_heuristic (G, k, p, R=20):
         #     for node in CC[c]:
         #         if random.random() < 1.0/weighted_score:
         #             scores[node] += weighted_score
-        print it + 1, time.time() - start
-    S = nlargest(k, scores.iteritems(), key=operator.itemgetter(1)) # select k nodes with top scores
+        print(it + 1, time.time() - start)
+    S = nlargest(k, iter(scores.items()), key=operator.itemgetter(1)) # select k nodes with top scores
     return S

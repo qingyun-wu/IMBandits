@@ -4,8 +4,8 @@ __author__ = 'ivanovsergey'
 
 import networkx as nx
 
-from IC import runIC
-from degreeDiscount import degreeDiscountIC
+from .IC import runIC
+from .degreeDiscount import degreeDiscountIC
 
 #import matplotlib.pylab as plt
 import os
@@ -19,20 +19,20 @@ if __name__ == '__main__':
     with open('graphdata/../graphdata/hep.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u,v, weight=1)
             # G.add_edge(u, v, weight=1)
-    print 'Built graph G'
-    print time.time() - start
+    print('Built graph G')
+    print(time.time() - start)
 
     #calculate initial set
     seed_size = 10
     S = degreeDiscountIC(G, seed_size)
-    print 'Initial set of', seed_size, 'nodes chosen'
-    print time.time() - start
+    print('Initial set of', seed_size, 'nodes chosen')
+    print(time.time() - start)
 
     # write results S to file
     with open('visualisation.txt', 'w') as f:
@@ -46,8 +46,8 @@ if __name__ == '__main__':
         T = runIC(G, S)
         avg += float(len(T))/iterations
         # print i, 'iteration of IC'
-    print 'Avg. Targeted', int(round(avg)), 'nodes out of', len(G)
-    print time.time() - start
+    print('Avg. Targeted', int(round(avg)), 'nodes out of', len(G))
+    print(time.time() - start)
 
     with open('IC/lemma1.txt', 'w') as f:
         f.write(str(len(S)) + os.linesep)

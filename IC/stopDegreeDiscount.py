@@ -8,9 +8,9 @@ import math
 
 import networkx as nx
 
-from priorityQueue import PriorityQueue as PQ # priority queue
-from IC import avgSize
-from IC.spreadDegreeDiscount import binarySearchBoundary
+from .priorityQueue import PriorityQueue as PQ # priority queue
+from .IC import avgSize
+from .IC.spreadDegreeDiscount import binarySearchBoundary
 
 
 def stopDegreeDiscount(G, tsize, ic_step=1, p=.01, iterations=200):
@@ -53,7 +53,7 @@ def stopDegreeDiscount(G, tsize, ic_step=1, p=.01, iterations=200):
         if stepk == ic_step:
             k = len(S)
             Tspread[k] = avgSize(G, S, p, iterations)
-            print k, Tspread[k]
+            print(k, Tspread[k])
             stepk = 0
         stepk += 1
 
@@ -72,17 +72,17 @@ if __name__ == '__main__':
     with open('graphdata/../graphdata/hep.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u, v, weight=1)
-    print 'Built graph G'
-    print time.time() - start
+    print('Built graph G')
+    print(time.time() - start)
 
     tsize = 50
     S, Tsize = stopDegreeDiscount(G, tsize, ic_step=int(tsize*0.38*2/3))
-    print 'Necessary %s initial nodes to target %s nodes in graph G' %(len(S), tsize)
-    print time.time() - start
+    print('Necessary %s initial nodes to target %s nodes in graph G' %(len(S), tsize))
+    print(time.time() - start)
 
     console = []

@@ -4,7 +4,7 @@ Representative possible worlds that aims to preserve degree distribution.
 Parchas et al. 2014 "The Pursuit of a Good Possible World"
 http://www.francescobonchi.com/SIGMOD14-UG.pdf
 '''
-from __future__ import division
+
 import networkx as nx
 from itertools import cycle
 import random, copy, time
@@ -21,14 +21,14 @@ def GP (G, Ep):
     Note: do not consider multigraphs.
     '''
     if type(G) == type(nx.Graph()):
-        expected_degree = dict(zip(G.nodes(), [0]*len(G)))
+        expected_degree = dict(list(zip(G.nodes(), [0]*len(G))))
         for e in Ep:
             # expected_degree[e[0]] += 1 - (1 - Ep[e])**G[e[0]][e[1]]["weight"]
             expected_degree[e[0]] += Ep[e]
 
         # initialize discrepancy
         discrepancy = dict()
-        for node, value in expected_degree.iteritems():
+        for node, value in expected_degree.items():
             discrepancy[node] = -value
 
         live_edges = []
@@ -42,8 +42,8 @@ def GP (G, Ep):
                 live_edges.append(e)
                 discrepancy[u] += 1
                 discrepancy[v] += 1
-        print 'Discrepancy after phase 1: %s' %sum(map(abs, discrepancy.values()))
-        print 'MAE: %s' %avg(map(abs, discrepancy.values()))
+        print('Discrepancy after phase 1: %s' %sum(map(abs, list(discrepancy.values()))))
+        print('MAE: %s' %avg(list(map(abs, list(discrepancy.values())))))
 
         E = nx.Graph()
         E.add_nodes_from(G)
@@ -65,17 +65,17 @@ def ADR(G, Ep, steps):
             E_edges[node] = []
         # P = round(sum([1 - (1-Ep[e])**G[e[0]][e[1]]["weight"] for e in G.edges_iter()]))
         P = round(sum([Ep[e] for e in G.edges_iter()]))
-        selected = dict(zip(G.edges(), [False]*len(G.edges())))
+        selected = dict(list(zip(G.edges(), [False]*len(G.edges()))))
         number_of_edges = 0
 
-        expected_degree = dict(zip(G.nodes(), [0]*len(G)))
+        expected_degree = dict(list(zip(G.nodes(), [0]*len(G))))
         for e in Ep:
             # expected_degree[e[0]] += 1 - (1 - Ep[e])**G[e[0]][e[1]]["weight"]
             expected_degree[e[0]] += Ep[e]
 
         # initialize discrepancy
         discrepancy = dict()
-        for node, value in expected_degree.iteritems():
+        for node, value in expected_degree.items():
             discrepancy[node] = -value
 
         # sorted_edges = cycle(sorted(G.edges(), key = lambda e: 1 - (1 - Ep[e])**G[e[0]][e[1]]["weight"], reverse = True))
@@ -84,7 +84,7 @@ def ADR(G, Ep, steps):
         # Phase 1: select first live edges
         while number_of_edges < P:
             # e, _ = sorted_edges.next()
-            e = sorted_edges.next()
+            e = next(sorted_edges)
             # if not selected[e] and random.random() < 1 - (1 - Ep[e])**G[e[0]][e[1]]["weight"]:
             if not selected[e] and random.random() < Ep[e]:
                 E_edges[e[0]].append((e[0], e[1]))
@@ -93,7 +93,7 @@ def ADR(G, Ep, steps):
                 discrepancy[e[1]] += 1
                 selected[e] = True
                 number_of_edges += 1
-        blocked_edges = [e for e, value in selected.iteritems() if not value]
+        blocked_edges = [e for e, value in selected.items() if not value]
         # print 'Discrepancy after phase 1: %s' %sum(map(abs, discrepancy.values()))
 
         # Phase 2: rewire live edges with blocked edges
@@ -130,7 +130,7 @@ def ADR(G, Ep, steps):
         # print 'MAE: %s' %avg(map(abs, discrepancy.values()))
 
         selected_edges = []
-        for edges_list in E_edges.values():
+        for edges_list in list(E_edges.values()):
             selected_edges.extend(edges_list)
         E = nx.Graph()
         E.add_nodes_from(G)
@@ -198,12 +198,12 @@ def bipartite(w, discrepancy):
 def ABM(G, Ep):
     if type(G) == type(nx.Graph()):
         # calculate expected degree
-        expected_degree = dict(zip(G.nodes(), [0]*len(G)))
+        expected_degree = dict(list(zip(G.nodes(), [0]*len(G))))
         for e in Ep:
             # expected_degree[e[0]] += 1 - (1 - Ep[e])**G[e[0]][e[1]]["weight"]
             expected_degree[e[0]] += Ep[e]
 
-        current_degree = dict(zip(G.nodes(), [0]*len(G)))
+        current_degree = dict(list(zip(G.nodes(), [0]*len(G))))
         Em_edges = []
         Eprime_edges = []
 
@@ -213,7 +213,7 @@ def ABM(G, Ep):
             b[node] = round(expected_degree[node])
 
         unsorted_edges = G.edges()
-        shuffled_idxs = range(len(G.edges()))
+        shuffled_idxs = list(range(len(G.edges())))
         random.shuffle(shuffled_idxs)
         shuffled_edges = [unsorted_edges[idx] for idx in shuffled_idxs]
         for e in shuffled_edges:
@@ -246,7 +246,7 @@ def ABM(G, Ep):
                 w[e] = weight
 
         Gprime = nx.Graph()
-        Gprime.add_weighted_edges_from(map(lambda ((u, v), weight): (u,v,weight), w.items()))
+        Gprime.add_weighted_edges_from([(u_v_weight[0][0],u_v_weight[0][1],u_v_weight[1]) for u_v_weight in list(w.items())])
         Ebp_edges = bipartite(w, discrepancy)
         # print 'Discrepancy after phase 2: %s' %sum(map(abs, discrepancy.values()))
         # print 'MAE: %s' %avg(map(abs, discrepancy.values()))

@@ -9,9 +9,9 @@ from copy import deepcopy # copy graph object
 from random import random
 import math
 
-from IC.IC import runIC
-from priorityQueue import PriorityQueue as PQ
-from newGreedyIC import newGreedyIC
+from .IC.IC import runIC
+from .priorityQueue import PriorityQueue as PQ
+from .newGreedyIC import newGreedyIC
 
 
 def binarySearchBoundary(G, k, Tsize, targeted_size, step, p, iterations):
@@ -29,7 +29,7 @@ def binarySearchBoundary(G, k, Tsize, targeted_size, step, p, iterations):
         Tsize[k] = avg
     # check values of Tsize in between last 2 calculated steps
     while stepk != 1:
-        print k, stepk, Tsize[k]
+        print(k, stepk, Tsize[k])
         if Tsize[k] >= targeted_size:
             stepk = -int(math.ceil(float(abs(stepk))/2))
         else:
@@ -55,7 +55,7 @@ def bfs(E, S):
     for u in S:
         if u in E:
             if u not in Rs: Rs.append(u)
-            for v in E[u].keys():
+            for v in list(E[u].keys()):
                 if v not in Rs: Rs.append(v)
     return Rs
 
@@ -110,13 +110,13 @@ def spreadNewGreedyIC(G, targeted_size, step=1, p=.01, S0=[], iterations = 200):
                     s.add_task(v, priority - float(len(bfs(E, [v])))/R)
 
             if idx == int(prg_idx*prcnt*R):
-                print '%s%%...' %(int(prg_idx*prcnt*100))
+                print('%s%%...' %(int(prg_idx*prcnt*100)))
                 prg_idx += 1
             idx += 1
         # add vertex with maximum potential spread
         task, priority = s.pop_item()
         S.append(task)
-        print i, len(S), task, -priority, time.time() - start
+        print(i, len(S), task, -priority, time.time() - start)
 
         tsize = 0
         for j in range(R):

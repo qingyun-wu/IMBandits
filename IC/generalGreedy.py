@@ -4,8 +4,8 @@
 '''
 __author__ = 'ivanovsergey'
 
-from priorityQueue import PriorityQueue as PQ
-from IC.IC import runIC
+from .priorityQueue import PriorityQueue as PQ
+from .IC.IC import runIC
 
 def generalGreedy(G, k, p=.01):
     ''' Finds initial seed set S using general greedy heuristic
@@ -29,5 +29,5 @@ def generalGreedy(G, k, p=.01):
                     s.add_task(v, priority - float(len(runIC(G, S + [v], p)))/R) # add normalized spread value
         task, priority = s.pop_item()
         S.append(task)
-        print i, k, time.time() - start
+        print(i, k, time.time() - start)
     return S

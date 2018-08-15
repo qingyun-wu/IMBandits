@@ -3,7 +3,7 @@
 [1] -- Scalable Influence Maximization for Prevalent Viral Marketing in Large-Scale Social Networks.
 '''
 
-from __future__ import division
+
 import networkx as nx
 import math, time
 from copy import deepcopy
@@ -17,7 +17,7 @@ def updateAP(ap, S, PMIIAv, PMIIA_MIPv, Ep):
     PMIIAv is rooted at v.
     '''
     # going from leaves to root
-    sorted_MIPs = sorted(PMIIA_MIPv.iteritems(), key = lambda (_, MIP): len(MIP), reverse = True)
+    sorted_MIPs = sorted(iter(PMIIA_MIPv.items()), key = lambda __MIP: len(__MIP[1]), reverse = True)
     for u, _ in sorted_MIPs:
         if u in S:
             ap[(u, PMIIAv)] = 1
@@ -34,7 +34,7 @@ def updateAP(ap, S, PMIIAv, PMIIA_MIPv, Ep):
 
 def updateAlpha(alpha, v, S, PMIIAv, PMIIA_MIPv, Ep, ap):
     # going from root to leaves
-    sorted_MIPs =  sorted(PMIIA_MIPv.iteritems(), key = lambda (_, MIP): len(MIP))
+    sorted_MIPs =  sorted(iter(PMIIA_MIPv.items()), key = lambda __MIP1: len(__MIP1[1]))
     for u, mip in sorted_MIPs:
         if u == v:
             alpha[(PMIIAv, u)] = 1
@@ -149,7 +149,7 @@ def PMIA(G, k, theta, Ep):
     start = time.time()
     # initialization
     S = []
-    IncInf = dict(zip(G.nodes(), [0]*len(G)))
+    IncInf = dict(list(zip(G.nodes(), [0]*len(G))))
     PMIIA = dict() # node to tree
     PMIOA = dict()
     PMIIA_MIP = dict() # node to MIPs (dict)
@@ -165,12 +165,12 @@ def PMIA(G, k, theta, Ep):
         updateAlpha(alpha, v, S, PMIIA[v], PMIIA_MIP[v], Ep, ap)
         for u in PMIIA[v]:
             IncInf[u] += alpha[(PMIIA[v], u)]*(1 - ap[(u, PMIIA[v])])
-    print 'Finished initialization'
-    print time.time() - start
+    print('Finished initialization')
+    print(time.time() - start)
 
     # main loop
     for i in range(k):
-        u, _ = max(IncInf.iteritems(), key = lambda (dk, dv): dv)
+        u, _ = max(iter(IncInf.items()), key = lambda dk_dv: dk_dv[1])
         # print i+1, "node:", u, "-->", IncInf[u]
         IncInf.pop(u) # exclude node u for next iterations
         PMIOA[u], PMIOA_MIP[u] = computePMIOA(G, u, theta, S, Ep)
@@ -195,7 +195,8 @@ def PMIA(G, k, theta, Ep):
 
     return S
 
-def getCoverage((G, S, Ep)):
+def getCoverage(xxx_todo_changeme):
+    (G, S, Ep) = xxx_todo_changeme
     return len(runIAC(G, S, Ep))
 
 if __name__ == "__main__":
@@ -214,8 +215,8 @@ if __name__ == "__main__":
     dataset = "gnu09"
 
     G = nx.read_gpickle("../../graphs/%s.gpickle" %dataset)
-    print 'Read graph G'
-    print time.time() - start
+    print('Read graph G')
+    print(time.time() - start)
 
     Ep = dict()
     with open("Ep_%s_%s1.txt" %(dataset, ep_model)) as f:
@@ -242,18 +243,18 @@ if __name__ == "__main__":
     dbox_time_file = open("%/%", DROPBOX_FOLDER, time_filename, "a+")
     for length in range(1, 250, 5):
         time2length = time.time()
-        print "Start finding solution for length = %s" %length
+        print("Start finding solution for length = %s" %length)
 
         time2S = time.time()
         S = PMIA(G, length, theta, Ep)
         time2complete = time.time() - time2S
-        print >>time_file, (time2complete)
-        print >>dbox_time_file, (time2complete)
-        print 'Finish finding S in %s sec...' %(time2complete)
+        print((time2complete), file=time_file)
+        print((time2complete), file=dbox_time_file)
+        print('Finish finding S in %s sec...' %(time2complete))
 
-        print 'Writing S to files...'
-        print >>seeds_filename, json.dumps(S)
-        print >>dbox_seeds_file, json.dumps(S)
+        print('Writing S to files...')
+        print(json.dumps(S), file=seeds_filename)
+        print(json.dumps(S), file=dbox_seeds_file)
 
         # print "Start calculating coverage..."
         # # def map_AvgIAC (it):
@@ -274,12 +275,12 @@ if __name__ == "__main__":
         # with open(DROPBOX + 'plotdata/plot' + FILENAME, 'w+') as fp:
         #     json.dump(l2c, fp)
 
-        print 'Total time for length = %s: %s sec' %(length, time.time() - time2length)
-        print '----------------------------------------------'
+        print('Total time for length = %s: %s sec' %(length, time.time() - time2length))
+        print('----------------------------------------------')
 
 
     seeds_file.close()
     dbox_seeds_file.close()
     time_file.close()
     dbox_time_file.close()
-    print 'Total time: %s' %(time.time() - start)
+    print('Total time: %s' %(time.time() - start))

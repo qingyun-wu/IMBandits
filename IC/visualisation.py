@@ -5,7 +5,7 @@ from copy import deepcopy
 import networkx as nx
 import matplotlib.pylab as plt
 
-from IC.IC import runIC
+from .IC.IC import runIC
 
 
 def neighborsOfS(G, S, radius):
@@ -83,7 +83,7 @@ def drawSpread(G,S,T):
     nx.draw_networkx_nodes(E, pos, T, node_color='b', node_size=300)
     nx.draw_networkx_nodes(E, pos, S, node_color='w', node_size=300)
 
-    nx.draw_networkx_labels(E, pos, labels=dict(zip(T,T)), font_color='r', font_size=10, font_weight='extra bold')
+    nx.draw_networkx_labels(E, pos, labels=dict(list(zip(T,T))), font_color='r', font_size=10, font_weight='extra bold')
 
     nx.draw_networkx_edges(G, pos,edgelist=E.edges(), width=.5, edge_color='g', alpha=.5)
 
@@ -101,7 +101,7 @@ def drawStar(G,S,radius=1,layout='spring'):
     nx.draw_networkx_nodes(Star, pos, node_color='k', node_size=10)
     nx.draw_networkx_nodes(Star, pos, S, node_color='w', node_size=300)
 
-    nx.draw_networkx_labels(Star, pos, labels=dict(zip(S,S)), font_color='r', font_size=10, font_weight='extra bold')
+    nx.draw_networkx_labels(Star, pos, labels=dict(list(zip(S,S))), font_color='r', font_size=10, font_weight='extra bold')
 
     nx.draw_networkx_edges(G, pos,edgelist=Star.edges(), width=.5, edge_color='g', alpha=.5)
 
@@ -118,27 +118,27 @@ if __name__ == '__main__':
     with open('graphdata/../graphdata/hep.txt') as f:
         n, m = f.readline().split()
         for line in f:
-            u, v = map(int, line.split())
+            u, v = list(map(int, line.split()))
             try:
                 G[u][v]['weight'] += 1
             except:
                 G.add_edge(u,v, weight=1)
-    print 'Built graph G'
-    print time.time() - start
+    print('Built graph G')
+    print(time.time() - start)
 
     #read in initial set
     S = []
     with open('visualisation.txt') as f:
         for line in f:
             S.append(int(line))
-    print 'Read initial seed sddet S'
-    print time.time() - start
+    print('Read initial seed sddet S')
+    print(time.time() - start)
 
     #drawStar(G, S, radius=0, layout='spring')
 
     T = runIC(G,S)
-    print 'Targeted %s nodes' %(len(T))
-    print time.time() - start
+    print('Targeted %s nodes' %(len(T)))
+    print(time.time() - start)
     drawSpread(G,S,T)
 
     plt.axis('off')

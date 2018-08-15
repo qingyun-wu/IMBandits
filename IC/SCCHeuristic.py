@@ -9,7 +9,7 @@ References:
 Kempe et al. "Maximizing the spread of influence through a social network" Claim 2.3
 '''
 
-from __future__ import division
+
 
 import random, operator, time, os
 from heapq import nlargest
@@ -25,7 +25,7 @@ def SCC_heuristic (G, k, p, R=20):
      Output:
      S -- seed set (list of tuples: for each tuple first argument is a node, second argument is its score)
     '''
-    scores = dict(zip(G.nodes(), [0]*len(G))) # initialize scores
+    scores = dict(list(zip(G.nodes(), [0]*len(G)))) # initialize scores
     start = time.time()
     for it in range(R):
         # remove blocked edges from graph G
@@ -35,7 +35,7 @@ def SCC_heuristic (G, k, p, R=20):
 
         # initialize SCC
         SCC = dict() # each component is reflection os the number of a component to its members
-        explored = dict(zip(E.nodes(), [False]*len(E)))
+        explored = dict(list(zip(E.nodes(), [False]*len(E))))
         c = 0
         # perform BFS to discover SCC
         for node in E:
@@ -43,12 +43,12 @@ def SCC_heuristic (G, k, p, R=20):
                 c += 1
                 explored[node] = True
                 SCC[c] = [node]
-                component = E[node].keys()
+                component = list(E[node].keys())
                 for neighbor in component:
                     if not explored[neighbor]:
                         explored[neighbor] = True
                         SCC[c].append(neighbor)
-                        component.extend(E[neighbor].keys())
+                        component.extend(list(E[neighbor].keys()))
 
         # add score only to top components
         # topSCC = nlargest(k, SCC.iteritems(), key= lambda (dk,dv): len(dv))
@@ -63,6 +63,6 @@ def SCC_heuristic (G, k, p, R=20):
             weighted_score = len(SCC[c]) # score is size of a compnonet
             for node in SCC[c]:
                 scores[node] += weighted_score
-        print it + 1, time.time() - start
-    S = nlargest(k, scores.iteritems(), key=operator.itemgetter(1)) # select k nodes with top scores
+        print(it + 1, time.time() - start)
+    S = nlargest(k, iter(scores.items()), key=operator.itemgetter(1)) # select k nodes with top scores
     return S

@@ -6,13 +6,13 @@ Use those MPST to select a possible world (PW) and approximate reliability.
 
 We are solving sparsification problem of uncertain graphs for preserving reliability.
 '''
-from __future__ import division
+
 import networkx as nx
 from itertools import cycle
 from math import exp, log
 import random, time, sys, json, os
 from collections import Counter
-from itertools import product, izip
+from itertools import product
 import matplotlib.pyplot as plt
 import matplotlib
 
@@ -48,23 +48,23 @@ def get_PW(G):
     assert type(G) == type(nx.Graph()), "Graph should be undirected"
 
     P = sum([exp(1)**(-data["weight"]) for (u,v,data) in G.edges(data=True)]) # expected number of edges
-    print 'P:', P
+    print('P:', P)
     E = G.copy()
 
     # extract multiple MPST until all edges in G are removed
     MPSTs = []
     while len(E.edges()):
         mpst = minimum_spanning_tree(E)
-        print '|mpst|:', len(mpst), '|mpst.edges|:', len(mpst.edges())
+        print('|mpst|:', len(mpst), '|mpst.edges|:', len(mpst.edges()))
         MPSTs.append(mpst)
         E.remove_edges_from(mpst.edges())
-    print 'Found %s MPST' %(len(MPSTs))
+    print('Found %s MPST' %(len(MPSTs)))
 
     # sort edges
     sorted_edges = []
     for mpst in MPSTs:
-        sorted_edges.extend(sorted(mpst.edges(data=True), key = lambda (u,v,data): exp(1)**(-data["weight"]), reverse=True))
-    print "Sorted edges..."
+        sorted_edges.extend(sorted(mpst.edges(data=True), key = lambda u_v_data2: exp(1)**(-u_v_data2[2]["weight"]), reverse=True))
+    print("Sorted edges...")
 
     # create a PW
     selected = dict()
@@ -82,8 +82,8 @@ def get_PW(G):
         # stop when expected number of edges reached
         if len(PW.edges()) > P:
             break
-    print 'PW:', len(PW), 'PW.edges:', len(PW.edges())
-    print 'G:', len(G), 'G.edges', len(G.edges())
+    print('PW:', len(PW), 'PW.edges:', len(PW.edges()))
+    print('G:', len(G), 'G.edges', len(G.edges()))
     return PW, MPSTs
 
 def find_reliability_in_mpst(mpst, u, v):
@@ -125,7 +125,7 @@ def get_rel_with_mpst(MPSTs, pairs=None):
                 print_dict[pair] = rel[pair]
     else:
         for en, mpst in enumerate(MPSTs):
-            print 'mpst #', en, "len(mpst):", len(mpst)
+            print('mpst #', en, "len(mpst):", len(mpst))
             nodes = mpst.nodes()
             for i in range(len(nodes)-1):
                 for j in range(i+1, len(nodes)):
@@ -135,9 +135,9 @@ def get_rel_with_mpst(MPSTs, pairs=None):
                     rel[(u,v)] = rel.get((u,v), 0) + r
                     rel[(v,u)] = rel.get((v,u), 0) + r
     if pairs:
-        print sorted(print_dict.items(), key = lambda (_,v): v, reverse = True)[:10]
+        print(sorted(list(print_dict.items()), key = lambda __v: __v[1], reverse = True)[:10])
     else:
-        print sorted(rel.items(), key = lambda (_,v): v, reverse=True)[:10]
+        print(sorted(list(rel.items()), key = lambda __v4: __v4[1], reverse=True)[:10])
     return rel
 
 def get_rel_with_mc(G, mc=100, pairs=None, cutoff_multiplier=2):
@@ -152,7 +152,7 @@ def get_rel_with_mc(G, mc=100, pairs=None, cutoff_multiplier=2):
     cutoff_multiplier of the number of MC simulations a pair should participate
     not to be pruned.
     '''
-    print 'MC:', mc
+    print('MC:', mc)
     # initialize reliability
     rel = dict()
     for _ in range(mc):
@@ -188,13 +188,13 @@ def get_rel_with_mc(G, mc=100, pairs=None, cutoff_multiplier=2):
         if key in print_dict:
             print_dict[key] /= mc
     if pairs:
-        print sorted(print_dict.items(), key = lambda (k,v): v, reverse = True)[:10]
-        cutoff_rel = dict(filter(lambda (k,v): v >= cutoff_multiplier/mc, rel.iteritems()))
-        print 'Found %s non-zero rel out of %s pairs' %(len(filter(lambda v: v >= cutoff_multiplier/mc, print_dict.values())), len(print_dict))
+        print(sorted(list(print_dict.items()), key = lambda k_v5: k_v5[1], reverse = True)[:10])
+        cutoff_rel = dict([k_v for k_v in iter(rel.items()) if k_v[1] >= cutoff_multiplier/mc])
+        print('Found %s non-zero rel out of %s pairs' %(len([v for v in list(print_dict.values()) if v >= cutoff_multiplier/mc]), len(print_dict)))
     else:
-        print sorted(rel.items(), key = lambda (k,v): v, reverse=True)[:10]
-        cutoff_rel = dict(filter(lambda (k,v): v >= cutoff_multiplier/mc, rel.iteritems()))
-        print 'Found %s non-zero rel out of %s pairs' %(len(filter(lambda v: v >= cutoff_multiplier/mc, print_dict.values())), len(print_dict))
+        print(sorted(list(rel.items()), key = lambda k_v6: k_v6[1], reverse=True)[:10])
+        cutoff_rel = dict([k_v3 for k_v3 in iter(rel.items()) if k_v3[1] >= cutoff_multiplier/mc])
+        print('Found %s non-zero rel out of %s pairs' %(len([v for v in list(print_dict.values()) if v >= cutoff_multiplier/mc]), len(print_dict)))
     return cutoff_rel
 
 def get_rel_for_pw(PW, pairs=None):
@@ -219,11 +219,11 @@ def get_rel_for_pw(PW, pairs=None):
         CCs = nx.connected_components(PW)
         for cc in CCs:
             cc_pairs = list(product(cc, repeat=2))
-            rel.update(dict(zip(cc_pairs, [1]*len(cc_pairs))))
+            rel.update(dict(list(zip(cc_pairs, [1]*len(cc_pairs)))))
     if pairs:
-        print sorted(print_dict.items(), key = lambda (k,v): v, reverse = True)[:10]
+        print(sorted(list(print_dict.items()), key = lambda k_v7: k_v7[1], reverse = True)[:10])
     else:
-        print sorted(rel.items(), key = lambda (k,v): v, reverse=True)[:10]
+        print(sorted(list(rel.items()), key = lambda k_v8: k_v8[1], reverse=True)[:10])
     return rel
 
 def get_objective(G_rel, PW_rel):
@@ -231,8 +231,8 @@ def get_objective(G_rel, PW_rel):
     Computes the objective, which is the sum of reliability discrepancies over all pairs of nodes.
     '''
     Obj = 0
-    pairs = set(G_rel.keys() + PW_rel.keys())
-    print 'Found %s pairs' %len(pairs)
+    pairs = set(list(G_rel.keys()) + list(PW_rel.keys()))
+    print('Found %s pairs' %len(pairs))
     for p in pairs:
         if p[0] != p[1]:
             Obj += abs(G_rel.get(p, 0) - PW_rel.get(p, 0))
@@ -267,7 +267,7 @@ def get_sparsified_mpst(MPSTs, K):
             sorted_edges.extend(mpst.edges(data = True))
         else:
             sorted_edges.extend(sorted(mpst.edges(data=True),
-                                       key = lambda (u,v,data): exp(1)**(-data["weight"]),
+                                       key = lambda u_v_data: exp(1)**(-u_v_data[2]["weight"]),
                                        reverse=True))
             break
     return sorted_edges[:K]
@@ -279,8 +279,8 @@ def get_sparsified_greedy(G, K):
     Expected to have -log(p_e) as weights in G.
     '''
     all_edges = G.edges(data=True)
-    sorted_edges = sorted(all_edges, key = lambda (u,v,data): exp(1)**(-data["weight"]), reverse=True)
-    print 'sorted edges...'
+    sorted_edges = sorted(all_edges, key = lambda u_v_data10: exp(1)**(-u_v_data10[2]["weight"]), reverse=True)
+    print('sorted edges...')
     # create a SP
     selected = dict()
     for (u,v,d) in all_edges:
@@ -297,7 +297,7 @@ def get_sparsified_greedy(G, K):
         # stop when expected number of edges reached
         if len(SP.edges()) == int(progress*.1*K):
             progress += 1
-            print '%s%% processed...' %(progress*10)
+            print('%s%% processed...' %(progress*10))
         if len(SP.edges()) == K:
             break
     return SP
@@ -310,7 +310,7 @@ def get_sparsified_top(G, K):
     '''
     all_edges = G.edges(data=True)
     sorted_edges = sorted(all_edges,
-                          key = lambda (u,v,data): exp(1)**(-data["weight"]),
+                          key = lambda u_v_data11: exp(1)**(-u_v_data11[2]["weight"]),
                           reverse=True)
     return sorted_edges[:K]
 
@@ -338,7 +338,7 @@ def get_sparsified_top2(G, K, edge_rel=None):
     else:
         G_rel = edge_rel
     sorted_edges = sorted(all_edges,
-                          key = lambda (u,v,d): exp(1)**(-d["weight"])*(1 - G_rel[(u,v)])/(1 - exp(1)**(-d["weight"])),
+                          key = lambda u_v_d12: exp(1)**(-u_v_d12[2]["weight"])*(1 - G_rel[(u_v_d12[0],u_v_d12[1])])/(1 - exp(1)**(-u_v_d12[2]["weight"])),
                           reverse = True)
     return sorted_edges[:K]
 
@@ -355,7 +355,7 @@ def get_sparsified_top3(G, K, edge_rel=None):
     else:
         G_rel = edge_rel
     sorted_edges = sorted(all_edges,
-                          key = lambda (u,v,d): exp(1)**(-d["weight"])*(1 - G_rel[(u,v)])/(1 - exp(1)**(-d["weight"])),
+                          key = lambda u_v_d13: exp(1)**(-u_v_d13[2]["weight"])*(1 - G_rel[(u_v_d13[0],u_v_d13[1])])/(1 - exp(1)**(-u_v_d13[2]["weight"])),
                           reverse = False)
     return sorted_edges[:K]
 
@@ -366,15 +366,15 @@ def get_sparsified_APSP(G, K, cutoff=None):
 
     Expected to have -log(p_e) as weights in G.
     '''
-    print 'Start APSP...'
+    print('Start APSP...')
     time2APSP = time.time()
     paths = {}
     for i, n in enumerate(G):
-        print i, len(G)
+        print(i, len(G))
         paths[n] = nx.single_source_dijkstra_path(G, n, cutoff=cutoff,
                                                weight="weight")
-    print 'Finish APSP in %s sec' %(time.time() - time2APSP)
-    print paths
+    print('Finish APSP in %s sec' %(time.time() - time2APSP))
+    print(paths)
 
     checked = dict()
     edges_score = dict()
@@ -391,9 +391,9 @@ def get_sparsified_APSP(G, K, cutoff=None):
                     edges_score[(e2, e1)] = edges_score.get((e2, e1), 0) + 1
                 checked[(u,v)] = True
                 checked[(v,u)] = True
-    print edges_score
+    print(edges_score)
     sorted_edges = sorted(G.edges(data=True),
-                          key = lambda (u,v,d): exp(1)**(-d["weight"])*edges_score[(u,v)],
+                          key = lambda u_v_d14: exp(1)**(-u_v_d14[2]["weight"])*edges_score[(u_v_d14[0],u_v_d14[1])],
                           reverse = True)
 
     return sorted_edges[:K]
@@ -411,7 +411,7 @@ def get_sparsified_MP_MPST(G, K, directed=False):
         MPST_edges = list(nx.minimum_spanning_edges(G,weight='weight',data=True))
     edges = [e for e in G_edges if e not in MPST_edges]
     mp_edges = sorted(edges,
-                    key = lambda (u,v,d): exp(1)**(-d["weight"]),
+                    key = lambda u_v_d15: exp(1)**(-u_v_d15[2]["weight"]),
                     reverse = True)
     if len(MPST_edges) <= K:
         MPST_edges.extend(mp_edges[:(K - len(MPST_edges))])
@@ -425,19 +425,19 @@ def get_sparsified_MP_MPST(G, K, directed=False):
         for u in MPST:
             degrees[u] = len(MPST[u])
             if degrees[u] == 1:
-                v, d = MPST[u].items()[0]
+                v, d = list(MPST[u].items())[0]
                 leaves.add((u,v,d["weight"]))
         for _ in range(len(MPST_edges) - K):
-            u,v,d = min(leaves, key = lambda (u,v,d): exp(1)**(-d))
+            u,v,d = min(leaves, key = lambda u_v_d: exp(1)**(-u_v_d[2]))
             MPST.remove_edge(u,v)
             leaves.remove((u,v,d))
-            v_edges = MPST[v].items()
+            v_edges = list(MPST[v].items())
             if len(v_edges) == 1:
                 w, t = v_edges[0]
                 leaves.add((v,w,t["weight"]))
             elif len(v_edges) == 0:
                 leaves.remove((v,u,d))
-        print len(MPST.edges()), K
+        print(len(MPST.edges()), K)
         MPST_edges = MPST.edges(data=True)
 
         # MPST_edges = sorted(MPST_edges,
@@ -458,16 +458,16 @@ def get_sparsified_MPSTplus(G, K):
     :return: edges with probabilities -log(p_e) of size K
     '''
     G_edges = G.edges(data=True)
-    print 'Finding MPST'
+    print('Finding MPST')
     MPST_edges = list(nx.minimum_spanning_edges(G,weight='weight',data=True))
-    print 'Found spanning tree'
+    print('Found spanning tree')
     if len(MPST_edges) <= K:
-        print 'Start sorting remaining edges'
+        print('Start sorting remaining edges')
         edges = [e for e in G_edges if e not in MPST_edges]
         mp_edges = sorted(edges,
-                    key = lambda (u,v,d): exp(1)**(-d["weight"]),
+                    key = lambda u_v_d9: exp(1)**(-u_v_d9[2]["weight"]),
                     reverse = True)
-        print 'Finished sorting edges'
+        print('Finished sorting edges')
         MPST_edges.extend(mp_edges[:(K - len(MPST_edges))])
     else:
         #remove edges that will not make isolated vertices
@@ -487,25 +487,25 @@ def get_sparsified_MPSTplus(G, K):
                 elif edge in power2:
                     power2[edge] -= 1
                 else:
-                    raise ValueError, "Edge %s should be in MPST" %edge
+                    raise ValueError("Edge %s should be in MPST" %edge)
 
         while len(MPST.edges()) > K:
             if len(power1) > 0:
-                e, val = max(power1.iteritems(), key = lambda(dk, dv): dv)
+                e, val = max(iter(power1.items()), key = lambda dk_dv: dk_dv[1])
                 # print e, val
                 power1.pop(e)
                 MPST.remove_edge(e[0],e[1])
                 _decrease_power(MPST, e[0], power1, power2)
                 _decrease_power(MPST, e[1], power1, power2)
             elif len(power2) > 0:
-                e, val = max(power2.iteritems(), key = lambda(dk, dv): dv)
+                e, val = max(iter(power2.items()), key = lambda dk_dv1: dk_dv1[1])
                 # print e, val
                 power2.pop(e)
                 MPST.remove_edge(e[0],e[1])
                 _decrease_power(MPST, e[0], power1, power2)
                 _decrease_power(MPST, e[1], power1, power2)
             else:
-                raise ValueError, "No more edges"
+                raise ValueError("No more edges")
 
         MPST_edges = MPST.edges(data=True)
     return MPST_edges
@@ -538,8 +538,8 @@ def get_edges_greedy_min(G,K):
                     max_prob = e_prob
                     max_edge = edge
         if max_edge == None:
-            raise ValueError, "Cannot find an edge"
-        print max_edge, max_prob
+            raise ValueError("Cannot find an edge")
+        print(max_edge, max_prob)
         edges[max_edge] = max_prob
         cur_d[max_edge[0]] += max_prob
         cur_d[max_edge[1]] += max_prob
@@ -573,8 +573,8 @@ def exp_degrees(G):
     :param G:
     :return:
     '''
-    in_d = dict(zip(G, [0]*len(G)))
-    out_d = dict(zip(G, [0]*len(G)))
+    in_d = dict(list(zip(G, [0]*len(G))))
+    out_d = dict(list(zip(G, [0]*len(G))))
     for v in G:
         for u in G[v]:
             out_d[v] += exp(1)**(-G[v][u]['weight'])
@@ -604,10 +604,10 @@ def pres_dir_degrees_ChungLu(edges, degrees, dir="in"):
         elif dir == "out":
             sum_d = denom[e[0]]
         if degrees[e[0]]*degrees[e[1]] > sum_d:
-            print '(',e[0],e[1],') -->', degrees[e[0]]*degrees[e[1]], sum_d
-        print '(',e[0],e[1],') -->', degrees[e[0]], degrees[e[1]], sum_d
+            print('(',e[0],e[1],') -->', degrees[e[0]]*degrees[e[1]], sum_d)
+        print('(',e[0],e[1],') -->', degrees[e[0]], degrees[e[1]], sum_d)
         p = degrees[e[0]]*degrees[e[1]]/sum_d
-        print p
+        print(p)
         Q.add_edge(*e, **{"weight": -log(p)})
     return Q
 
@@ -649,7 +649,7 @@ def get_graph_from_file(filename, directed=False):
         SP = nx.DiGraph()
     with open(filename) as f:
         for line in f:
-            u, v, p = map(float, line.split())
+            u, v, p = list(map(float, line.split()))
             if u != v:
                 SP.add_edge(int(u), int(v), weight = -log(p))
     return SP
@@ -661,7 +661,7 @@ def test_MC(G, pair, gt, MC_limit, chunks=10):
     '''
     errors = []
     mcs = [1 + i*int(MC_limit/chunks) for i in range(chunks+1)]
-    print mcs
+    print(mcs)
     rel = 0
     u, v = pair
     for mc in range(1, MC_limit+2):
@@ -739,7 +739,7 @@ def save_for_LP(f1, f2, G, G_orig, f3 = "edge_order.txt", f4 = "D.txt"):
             f.write("%s %s %s\n" %(e[0], e[1], edge_order[(e[0],e[1])]))
 
     nodes = set(G_orig).difference(G)
-    print "# nodes: ", len(nodes),
+    print("# nodes: ", len(nodes), end=' ')
     d = dict() # degree of remaining nodes
     for u in nodes:
         d[u] = 0
@@ -747,7 +747,7 @@ def save_for_LP(f1, f2, G, G_orig, f3 = "edge_order.txt", f4 = "D.txt"):
             p = exp(1)**(-G_orig[u][v]["weight"])
             d[u] += p
     surplus = sum(d.values())
-    print "surplus", surplus
+    print("surplus", surplus)
     with open(f4, "w+") as f:
         f.write('%s\n' %len(G_orig))
         f.write('%s\n' %surplus)
@@ -809,24 +809,24 @@ def save_for_LP_dir (Ainf, Aoutf, dinf, doutf, Q, G, e_ordf, D):
 
     sp_n = len(nodes)
     sp_m = len(edges)
-    print len(nodes), len(edges)
+    print(len(nodes), len(edges))
 
     # save din and dout
     with open(dinf, "w+") as f1, open(doutf, "w+") as f2:
         for i, u in enumerate(nodes):
             if i == 54307:
-                print u, v_ord[u], win[u], wout[u]
+                print(u, v_ord[u], win[u], wout[u])
             f1.write("%s %s %s\n" %(v_ord[u], 1, win[u]))
             f2.write("%s %s %s\n" %(v_ord[u], 1, wout[u]))
 
     # save number of nodes and surplus
     n = len(G)
     nodes = set(G).difference(Q)
-    print "# nodes: ", len(nodes),
+    print("# nodes: ", len(nodes), end=' ')
     in_surplus = sum([win[u] for u in nodes])
     out_surplus = sum([wout[u] for u in nodes])
-    print "in-degree surplus", in_surplus
-    print "out-degree surplus", out_surplus
+    print("in-degree surplus", in_surplus)
+    print("out-degree surplus", out_surplus)
     with open(D, "w+") as f:
         f.write("%s\n" %(n))
         f.write("%s\n" %(sp_n))
@@ -835,7 +835,7 @@ def save_for_LP_dir (Ainf, Aoutf, dinf, doutf, Q, G, e_ordf, D):
 
 def construct_lp_graph(lp_file, e_file, output_file):
     with open(lp_file) as f, open(e_file) as g, open(output_file, "w+") as h:
-        for x, y in izip(f,g):
+        for x, y in zip(f,g):
             d1 = x.split()
             d2 = y.split()
             h.write("%s %s %s\n" %(d2[0], d2[1], d1[0]))
@@ -853,7 +853,7 @@ def get_possible_worlds(graph_file, PW_folder, I):
     for i in range(I):
         with open(PW_folder + "PW%s.txt" %(i+1), "w+") as f:
             for line in f_lines:
-                d = map(float, line.split())
+                d = list(map(float, line.split()))
                 if random.random() < d[2]:
                     f.write(line)
 
@@ -883,7 +883,7 @@ if __name__ == "__main__":
     with open("Flickr/runtime/runtime.txt", "w") as f:
         pass
     for i in range(1,11):
-        print i
+        print(i)
         graph_file = "Flickr/LP/G%i.txt" %(i*10)
         PW_folder = "Flickr/PW/G%i/" %(i*10)
         if not os.path.exists(PW_folder):
@@ -891,7 +891,7 @@ if __name__ == "__main__":
         time2PW_start = time.time()
         get_possible_worlds(graph_file, PW_folder, 100)
         time2PW_finish = time.time() - time2PW_start
-        print 'Created worlds in %s sec' %(time2PW_finish)
+        print('Created worlds in %s sec' %(time2PW_finish))
         with open("Flickr/runtime/runtime.txt", 'a+') as f:
             f.write("%s\n" %(time2PW_finish))
 
@@ -1447,6 +1447,6 @@ if __name__ == "__main__":
         # print
         # print 'Spent %s for iteration' %(time.time() - time2track)
 
-    print "Finished execution in %s sec" %(time.time() - time2execute)
+    print("Finished execution in %s sec" %(time.time() - time2execute))
 
     console = []
