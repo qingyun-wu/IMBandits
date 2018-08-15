@@ -20,7 +20,7 @@ class CLUBUserStruct(LinUCBUserStruct):
 		self.counter = 0
 		self.CBPrime = 0.1
 		self.d = featureDimension
-	def updateParameters(self, articlePicked_FeatureVector, click,alpha_2):
+	def updateParameters(self, articlePicked_FeatureVector, click, alpha_2):
 		#LinUCBUserStruct.updateParameters(self, articlePicked_FeatureVector, click)
 		#alpha_2 = 1
 		self.A += np.outer(articlePicked_FeatureVector,articlePicked_FeatureVector)
@@ -45,7 +45,7 @@ class CLUBUserStruct(LinUCBUserStruct):
 		self.CAInv = np.linalg.inv(self.CA)
 		self.CTheta = np.dot(self.CAInv,self.Cb)
 
-	def getProb(self, alpha, article_FeatureVector,time):
+	def getProb(self, alpha, article_FeatureVector, time):
 		mean = np.dot(self.CTheta, article_FeatureVector)
 		var = np.sqrt(np.dot(np.dot(article_FeatureVector, self.CAInv),  article_FeatureVector))
 		pta = mean +  alpha * var*np.sqrt(math.log10(time+1))
@@ -54,7 +54,7 @@ class CLUBUserStruct(LinUCBUserStruct):
 		return pta
 
 class CLUBAlgorithm:
-	def __init__(self, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureDic, FeatureScaling, feedback = 'edge',  cluster_init="Erdos-Renyi"):
+	def __init__(self, G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureDic, FeatureScaling, feedback = 'edge',  cluster_init="Erdos-Renyi"):
 		self.time = 0
 		self.G = G
 		self.oracle = oracle
@@ -117,7 +117,7 @@ class CLUBAlgorithm:
 		for u in S:
 			self.SortedUsers[u].updateParametersofClusters(self.clusters, u, self.Graph, self.SortedUsers, self.userIDSortedList)
 			for (u, v) in self.G.edges(u):		
-				featureVector = self.FeatureScaling*self.FeatureDic[(u,v)]		
+				featureVector = self.FeatureScaling * self.FeatureDic[(u,v)]		
 				self.currentP[u][v]['weight']  = self.SortedUsers[u].getProb(self.alpha, featureVector, self.time)
 		
 	def updateGraphClusters(self,userID, binaryRatio):

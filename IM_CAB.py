@@ -1,5 +1,3 @@
-import numpy as np
-from LinUCB import *
 import math
 from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix
@@ -7,9 +5,14 @@ import datetime
 import os.path
 from conf import sim_files_folder, save_address
 from sklearn import linear_model
+from random import choice, random, sample
+import networkx as nx
+import numpy as np
+from BanditAlgorithms_LinUCB import *
+import collections
 class CABUserStruct(LinUCBUserStruct):
-	def __init__(self,featureDimension,  lambda_, userID):
-		LinUCBUserStruct.__init__(self,featureDimension = featureDimension, lambda_= lambda_)
+	def __init__(self, featureDimension,  lambda_, userID):
+		LinUCBUserStruct.__init__(self,featureDimension = featureDimension, lambda_= lambda_, userID = userID)
 		self.reward = 0
 		self.I = lambda_*np.identity(n = featureDimension)	
 		self.counter = 0
@@ -21,7 +24,7 @@ class CABUserStruct(LinUCBUserStruct):
 		self.A += np.outer(articlePicked_FeatureVector,articlePicked_FeatureVector)
 		self.b +=  articlePicked_FeatureVector*click
 		self.AInv = np.linalg.inv(self.A)
-		self.CoTheta = np.dot(self.AInv, self.b)
+		self.UserTheta = np.dot(self.AInv, self.b)
 		self.counter+=1
 		#print(self.CoTheta)
 	def getCBP(self, alpha, article_FeatureVector,time):
@@ -30,29 +33,48 @@ class CABUserStruct(LinUCBUserStruct):
 		return pta
 
 class CABOriginalAlgorithm():
-	def __init__(self,dimension,alpha,lambda_,n,alpha_2):
+	def __init__(self, G, seed_size, oracle, dimension, alpha,  alpha_2, lambda_, FeatureDic, FeatureScaling, gamma):
 		self.time = 0
-		#N_LinUCBAlgorithm.__init__(dimension = dimension, alpha=alpha,lambda_ = lambda_,n=n)
-		self.users = []
-		#self.gamma=gamma
-		#algorithm have n users, each user has a user structure
-		self.userNum=n
-		for i in range(n):
-			self.users.append(CABUserStruct(dimension,lambda_, i)) 
-
+		self.G = G
+		self.oracle = oracle
+		self.seed_size = seed_size
 		self.dimension = dimension
 		self.alpha = alpha
-		self.CanEstimateCoUserPreference = True
-		self.CanEstimateUserPreference = False
-		self.CanEstimateW = False
-		self.CanEstimateV = False
+		self.alpha_2 = alpha_2
+		self.lambda_ = lambda_
+		self.gamma = gamma
+		self.FeatureDic = FeatureDic
+		self.FeatureScaling = FeatureScaling
+
+		self.users = {}  #Nodes
+		self.currentP =nx.DiGraph()
+		for u in self.G.nodes():
+			self.users[u] = CABUserStruct(dimension, lambda_, u)
+			for v in self.G[u]:
+				self.currentP.add_edge(u,v, weight=random())
+		n = len(self.users)
+
+		self.userIDSortedList = list(self.users.keys())
+		self.userIDSortedList.sort()
+		self.SortedUsers = collections.OrderedDict(sorted(self.users.items()))
+
 		self.cluster=[]
 		self.a=0
-		self.startTime = datetime.datetime.now()
-		timeRun = self.startTime.strftime('_%m_%d_%H_%M') 
-		self.filenameWritePara=os.path.join(save_address, str(self.alpha)+'_'+'dynamic'+timeRun+'.cluster')
+
 	def decide(self,pool_articles,userID):
-		
+		self.time +=1
+		S = self.oracle(self.G, self.seed_size, self.currentP)
+		return S
+
+	def updateParameters(self, S, live_nodes, live_edges, click, userID):
+		for u in S:
+			for (u, v) in self.G.edges(u):
+				featureVector = self.FeatureScaling*self.FeatureDic[(u,v)]
+				if (u,v) in live_edges:
+					reward = live_edges[(u,v)]
+				else:
+					reward = 0
+
 		maxPTA = float('-inf')
 		articlePicked = None
 		WI=self.users[userID].CoTheta
@@ -98,11 +120,7 @@ class CABOriginalAlgorithm():
 
 
 		return picked
-		
-			
-	def updateParameters(self, articlePicked, click,userID, gamma):
-		#self.users[userID].updateParameters(articlePicked.contextFeatureVector[:self.dimension], click)
-		gamma = 0.1
+		gamma = self.gamma
 		if(self.users[userID].getCBP(self.alpha,articlePicked.contextFeatureVector[:self.dimension],self.time)>=gamma):
 			self.users[userID].updateParameters(articlePicked.contextFeatureVector[:self.dimension], click)
 		else:
@@ -130,9 +148,6 @@ class CABOriginalAlgorithm():
 
 		self.a=0
 		self.time +=1
-		
-					
-					
 					
 	def getCoTheta(self, userID):
 		return self.users[userID].CoTheta
