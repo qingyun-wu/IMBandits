@@ -20,6 +20,7 @@ class CABUserStruct(LinUCBUserStruct):
 		self.CoTheta= np.zeros(featureDimension)
 		self.d = featureDimension
 		self.ID = userID
+		self.cluster = {}
 	def updateParameters(self, articlePicked_FeatureVector, click):
 		self.A += np.outer(articlePicked_FeatureVector,articlePicked_FeatureVector)
 		self.b +=  articlePicked_FeatureVector*click
@@ -58,15 +59,49 @@ class CABOriginalAlgorithm():
 		self.userIDSortedList.sort()
 		self.SortedUsers = collections.OrderedDict(sorted(self.users.items()))
 
-		self.cluster=[]
 		self.a=0
 
-	def decide(self,pool_articles,userID):
+	def decide(self):
 		self.time +=1
+        self.updateGraphClusters()
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
-	def updateParameters(self, S, live_nodes, live_edges, click, userID):
+	def updateGraphClusters(self):
+        maxPTA = float('-inf')
+        articlePicked = None
+		for u in S:
+			WI = self.users[u].UserTheta
+			for (u, v) in self.G.edges(u):
+				clusterItem=[]
+				featureVector = self.FeatureScaling*self.FeatureDic[(u,v)]
+				CBI = self.users[u].getCBP(self.alpha, featureVector, self.time)
+				WJTotal=np.zeros(WI.shape)
+				CBJTotal=0.0
+	            for i in range(len(self.users)):
+	            	j = self.userIDSortedList[i]
+	                WJ = self.users[j].UserTheta
+	                CBJ = self.users[j].getCBP(self.alpha, featureVector, self.time)
+	                compare= np.dot(WI, featureVector) - np.dot(WJ, featureVector)               
+	                if (j != userID):
+	                    if (abs(compare) <= CBI + CBJ):
+	                        clusterItem.append(self.users[j])
+	                        WJTotal += WJ
+	                        CBJTotal += CBJ
+	                else:    
+	                    clusterItem.append(self.users[userID])
+	                    WJTotal + =WI
+	                    CBJTotal += CBI
+	            CW= WJTotal/len(clusterItem)
+	            CB= CBJTotal/len(clusterItem)
+	            x_pta = np.dot(CW,featureVector) + CB
+	            if x_pta > 1:
+	            	x_pta = 1
+	            self.currentP[u][v]['weight']  = x_pta
+	            self.users[u].cluster[v] = clusterItem
+
+	def updateParameters(self, S, live_nodes, live_edges):
+		gamma = self.gamma
 		for u in S:
 			for (u, v) in self.G.edges(u):
 				featureVector = self.FeatureScaling*self.FeatureDic[(u,v)]
@@ -74,83 +109,13 @@ class CABOriginalAlgorithm():
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-
-		maxPTA = float('-inf')
-		articlePicked = None
-		WI=self.users[userID].CoTheta
-		for k in pool_articles:
-			clusterItem=[]
-			featureVector = k.contextFeatureVector[:self.dimension]
-			CBI=self.users[userID].getCBP(self.alpha,featureVector,self.time)
-			temp=np.zeros((self.dimension,))
-			WJTotal=np.zeros((self.dimension,))
-			CBJTotal=0.0
-			for j in range(len(self.users)):
-				WJ=self.users[j].CoTheta
-				CBJ=self.users[j].getCBP(self.alpha,featureVector,self.time)
-				compare= np.dot(WI,featureVector)-np.dot(WJ,featureVector)
-				
-				#rwd2=np.dot(self.users[j].CoTheta,featureVector)
-				#diffR=abs(rwdi-rwdj)
-				
-				if(j!=userID):
-					
-					#print(diffR-abs(rwd1-rwd2))
-					if (abs(compare)<=CBJ+CBJ)&(self.users[j].CoTheta!=temp).all():
-						clusterItem.append(self.users[j])
-						WJTotal+=WJ
-						CBJTotal+=CBJ
-				else: 
-				
-					clusterItem.append(self.users[userID])
-					WJTotal+=WI
-					CBJTotal+=CBI
-			CW= WJTotal/len(clusterItem)
-			CB= CBJTotal/len(clusterItem)
-			#CW=WI
-			#CB=CBI
-			x_pta = np.dot(CW,featureVector)+CB
-			# pick article with highest Prob
-			if maxPTA < x_pta:
-				articlePicked = k.id
-				featureVectorPicked = k.contextFeatureVector[:self.dimension]
-				picked = k
-				maxPTA = x_pta
-				self.cluster=clusterItem
-
-
-		return picked
-		gamma = self.gamma
-		if(self.users[userID].getCBP(self.alpha,articlePicked.contextFeatureVector[:self.dimension],self.time)>=gamma):
-			self.users[userID].updateParameters(articlePicked.contextFeatureVector[:self.dimension], click)
-		else:
-			
-		
-			for i in range(len(self.cluster)):
-				if(self.cluster[i].getCBP(self.alpha,articlePicked.contextFeatureVector[:self.dimension],self.time)<gamma/4):
-					self.cluster[i].updateParameters(articlePicked.contextFeatureVector[:self.dimension], click)
-					self.a +=1
+				if (self.users[u].getCBP(self.alpha, featureVector, self.time) >= gamma):
+					self.users[u].updateParameters(featureVector, reward)
+				else:
+					clusterItem = self.users[u].cluster[v]
+					for i in range(len(clusterItem)):
+						if(self.cluster[i].getCBP(self.alpha, featureVector, self.time) < gamma / 4):
+							self.cluster[i].updateParameters(featureVector, reward)
+							self.a +=1
 				clusterNow.append(self.cluster[i].ID)
-			#clusterNow.append(userID)
-			#clusterNow.append(articlePicked.id)
-			if (clusterNow!=[]):
-				clusterNow.append(self.a)
-				clusterNow.append(userID)
-				# print(clusterNow)
-		
-		with open(self.filenameWritePara, 'a+') as f:
-			if(self.cluster!=[]):
-				f.write(str(self.time/self.userNum))
-				for i in range(len(self.cluster)):
-					f.write('\t'+str(self.cluster[i].ID))
-				f.write('\n')
-			
-		self.a=0
-		self.time +=1
-					
-	def getCoTheta(self, userID):
-		return self.users[userID].CoTheta
-
-	def getVoterDistance(self):
-		return [np.array(self.rdiffinside).mean(), np.array(self.rdiffoutside).mean()]
 
