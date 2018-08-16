@@ -14,6 +14,7 @@ from utilFunc import ReadGraph_NetHEPT_Epinions, ReadGraph_Flixster, ReadGraph_F
 from BanditAlgorithms import UCB1Algorithm, eGreedyAlgorithm 
 from BanditAlgorithms_LinUCB import N_LinUCBAlgorithm, LinUCBAlgorithm
 from BanditAlgorithms_CLUB import CLUBAlgorithm
+from IM_CAB import CABAlgorithm
 from IC.IC import runIC, runICmodel, runICmodel_n
 from IC.runIAC  import weightedEp, runIAC, runIACmodel, randomEp, uniformEp
 from generalGreedy import generalGreedy
@@ -141,41 +142,28 @@ if __name__ == '__main__':
     
     start = time.time()
     dataset = 'Flickr' #Choose from 'default', 'NetHEPT', 'Flickr'
-    # read in graph
-    
-
-    #Read in graph from Flixster Dataset
-    
-    #Flixster_G = ReadGraph_Flixster(Flixster_edgefile_address)
-    #Flixster_SmallG = ReadSmallGraph_Flixster(Flixster_edgefile_address)
-    #Epinions_G = ReadGraph_NetHEPT_Epinions(Epinions_edgefile_address)
-    #Flickr_G = ReadGraph_Flickr(Flickr_edgefile_address)
-    #Flickr_SubG = pickle.load(open('./datasets/Flickr/Final_SubG.G', 'rb'))
-    
-    
-    #G = NetHEPT_G
-    #G = Flixster_G 
-    #G = Flixster_SmallG
-    #G = Flickr_G 
-    #G = Epinions_G
-    #P = ConstructPfromG(G, PType = 'Random')
     FeatureScaling = 1.0
+    batchSize = 1
+    alpha = 0.1
+    lambda_ = 0.3
+    gamma = 0.1
+    alpha_2 = 0.1    
+
+    oracle = degreeDiscountIAC2
+
     if dataset == 'Flickr':
         dimension = 4
         seed_size = 40
         iterations = 60
-        # FeatureScaling = 0.2
+
         G = pickle.load(open('./datasets/Flickr/Small_Final_SubG.G', 'rb'), encoding='latin1')
-        #Get P
         print(len(G.nodes()))
         Flickr_Linear_PDic = pickle.load(open('./datasets/Flickr/Small_Final_Edge_P_Uniform_dim4', 'rb'), encoding='latin1')
         print(len(Flickr_Linear_PDic))
         P = nx.DiGraph()
         for (u,v) in G.edges():
             P.add_edge(u,v, weight = FeatureScaling*Flickr_Linear_PDic[(u,v)])
-            # print FeatureScaling*Flickr_Linear_PDic[(u,v)]
 
-        #Get Edge Feature
         print(len(G.nodes()), len(G.edges()))
         print(len(P.nodes()), len(P.edges()))
         Feature_Dic = pickle.load(open('./datasets/Flickr/Small_Final_Normalized_edgeFeatures_uniform_dim4.dic', 'rb'), encoding='latin1')
@@ -189,9 +177,7 @@ if __name__ == '__main__':
         P = nx.DiGraph()
         for (u,v) in G.edges():
             P.add_edge(u,v, weight = FeatureScaling*NetHEPT_Linear_PDic[(u,v)])
-            # print FeatureScaling*Flickr_Linear_PDic[(u,v)]
 
-        #Get Edge Feature
         print(len(G.nodes()), len(G.edges()))
         print(len(P.nodes()), len(P.edges()))
         Feature_Dic = pickle.load(open('./datasets/NetHEPT/Normalized_edgeFeatures_uniform_dim4.dic', 'rb'), encoding='latin1')
@@ -209,9 +195,7 @@ if __name__ == '__main__':
         P = nx.DiGraph()
         for (u,v) in G.edges():
             P.add_edge(u,v, weight = FeatureScaling*graph30_Linear_PDic[(u,v)])
-            # print FeatureScaling*Flickr_Linear_PDic[(u,v)]
 
-        #Get Edge Feature
         print(len(G.nodes()), len(G.edges()))
         print(len(P.nodes()), len(P.edges()))
         Feature_Dic = pickle.load(open('./datasets/graph30/Normalized_edgeFeatures_uniform_4.dic', 'rb'), encoding='latin1')
@@ -228,44 +212,9 @@ if __name__ == '__main__':
                     G.add_edge(u,v, weight=1)
         print('Built graph G')
         print(time.time() - start, 's')
-
-        #P = uniformEp(G, p = 0.01)
-        #Construct Ground-Truth P with random weight
-        #P = randomEp(G,0.2)
-        # Every incoming edge of v has propagation probability equals to 1/deg(v)
         P = weightedEp(G)
         print(time.time() - start, 'get P')
 
-
-
-    
-
-    # # read in T
-    # with open('lemma1.txt') as f:
-    #    T = []
-    #    k = int(f.readline())
-    #    for line in f:
-    #        T.append(int(line))
-    # print 'Read %s activated nodes' %k
-    # print time.time() - start
-    # S = [131, 639, 287, 267, 608, 100, 559, 124, 359, 66]
-    # k = len(S)
-    # T = runIC(G,S)
-
-    # highdegreeS = highdegreeSet(G,T,k)
-
-    # console = []
-    
-    batchSize = 1
-    
-    # oracle = generalGreedy
-    oracle = degreeDiscountIAC2
-
-    alpha = 0.01
-    lambda_ = 0.3
-
-
-    alpha_2 = 0.05
 
     simExperiment = simulateOnlineData(G = G, P = P, oracle = oracle, seed_size = seed_size, iterations = iterations, batchSize = batchSize)
     algorithms = {}
@@ -281,6 +230,6 @@ if __name__ == '__main__':
     # algorithms['CLUB_0.2'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
     algorithms['CLUB_1'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
     # algorithms['CLUB_4'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, 4.0, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
-
+    algorithms['CAB'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, gamma)
 
     simExperiment.runAlgorithms(algorithms)

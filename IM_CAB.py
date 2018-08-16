@@ -33,7 +33,7 @@ class CABUserStruct(LinUCBUserStruct):
 		pta = alpha * var#*np.sqrt(math.log10(time+1))
 		return pta
 
-class CABOriginalAlgorithm():
+class CABAlgorithm():
 	def __init__(self, G, seed_size, oracle, dimension, alpha,  alpha_2, lambda_, FeatureDic, FeatureScaling, gamma):
 		self.time = 0
 		self.G = G
