@@ -70,35 +70,36 @@ class CABAlgorithm():
     def updateGraphClusters(self):
         maxPTA = float('-inf')
         articlePicked = None
-        for u in S:
-            WI = self.users[u].UserTheta
-            for (u, v) in self.G.edges(u):
+        for i in range(len(self.userIDSortedList)):
+            id_i = self.userIDSortedList[i]
+            WI = self.users[id_i].UserTheta
+            for (id_i, v) in self.G.edges(id_i):
                 clusterItem=[]
-                featureVector = self.FeatureScaling*self.FeatureDic[(u,v)]
-                CBI = self.users[u].getCBP(self.alpha, featureVector, self.time)
+                featureVector = self.FeatureScaling*self.FeatureDic[(id_i,v)]
+                CBI = self.users[id_i].getCBP(self.alpha, featureVector, self.time)
                 WJTotal=np.zeros(WI.shape)
                 CBJTotal=0.0
-                for i in range(len(self.users)):
-                    j = self.userIDSortedList[i]
-                    WJ = self.users[j].UserTheta
-                    CBJ = self.users[j].getCBP(self.alpha, featureVector, self.time)
+                for j in range(len(self.users)):
+                    id_j = self.userIDSortedList[j]
+                    WJ = self.users[id_j].UserTheta
+                    CBJ = self.users[id_j].getCBP(self.alpha, featureVector, self.time)
                     compare= np.dot(WI, featureVector) - np.dot(WJ, featureVector)               
-                    if (j != userID):
+                    if (j != i):
                         if (abs(compare) <= CBI + CBJ):
-                            clusterItem.append(self.users[j])
+                            clusterItem.append(self.users[id_j])
                             WJTotal += WJ
                             CBJTotal += CBJ
                     else:    
-                        clusterItem.append(self.users[userID])
-                        WJTotal + =WI
+                        clusterItem.append(self.users[id_j])
+                        WJTotal += WI
                         CBJTotal += CBI
                 CW= WJTotal/len(clusterItem)
                 CB= CBJTotal/len(clusterItem)
                 x_pta = np.dot(CW,featureVector) + CB
                 if x_pta > 1:
                     x_pta = 1
-                self.currentP[u][v]['weight']  = x_pta
-                self.users[u].cluster[v] = clusterItem
+                self.currentP[id_i][v]['weight']  = x_pta
+                self.users[id_i].cluster[v] = clusterItem
 
     def updateParameters(self, S, live_nodes, live_edges):
         gamma = self.gamma
