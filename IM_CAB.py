@@ -145,7 +145,6 @@ class CABOriginalAlgorithm():
 					f.write('\t'+str(self.cluster[i].ID))
 				f.write('\n')
 			
-
 		self.a=0
 		self.time +=1
 					
