@@ -32,7 +32,7 @@ class simulateOnlineData:
         self.get_reward = runICmodel #IM model
         self.get_reward_n = runICmodel_n #IM model
         self.plot = True
-        return
+        
 
     def batchRecord(self, iter_):
         print("Iteration %d"%iter_, " Elapsed time", datetime.datetime.now() - self.startTime)

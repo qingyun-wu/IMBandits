@@ -46,7 +46,7 @@ class CABAlgorithm():
         self.gamma = gamma
         self.FeatureDic = FeatureDic
         self.FeatureScaling = FeatureScaling
-
+        self.feedback = 'edge'
         self.users = {}  #Nodes
         self.currentP =nx.DiGraph()
         for u in self.G.nodes():
