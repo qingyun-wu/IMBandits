@@ -118,5 +118,4 @@ class CABAlgorithm():
                         if(self.cluster[i].getCBP(self.alpha, featureVector, self.time) < gamma / 4):
                             self.cluster[i].updateParameters(featureVector, reward)
                             self.a +=1
-                clusterNow.append(self.cluster[i].ID)
 
