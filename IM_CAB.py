@@ -115,7 +115,11 @@ class CABAlgorithm():
                 else:
                     clusterItem = self.users[u].cluster[v]
                     for i in range(len(clusterItem)):
-                        if(self.cluster[i].getCBP(self.alpha, featureVector, self.time) < gamma / 4):
-                            self.cluster[i].updateParameters(featureVector, reward)
-                            self.a +=1
+                        if(clusterItem[i].getCBP(self.alpha, featureVector, self.time) < gamma):
+                            clusterItem[i].updateParameters(featureVector, reward)
 
+    def getLearntParameters(self, userID):
+        return self.users[userID].UserTheta
+        
+    def getP(self):
+        return self.currentP

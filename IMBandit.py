@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import time
 import pickle 
 import os
+import numpy as np
 from conf import save_address
 
 from utilFunc import ReadGraph_NetHEPT_Epinions, ReadGraph_Flixster, ReadGraph_Flickr, ReadSmallGraph_Flixster
@@ -55,7 +56,7 @@ class simulateOnlineData:
         tim_ = []
         self.BatchCumlateRegret = {}
         self.AlgRegret = {}
-
+        self.result_oracle = []
         for alg_name, alg in list(algorithms.items()):
             self.AlgRegret[alg_name] = []
             self.BatchCumlateRegret[alg_name] = []
@@ -72,6 +73,7 @@ class simulateOnlineData:
             # optimal_reward, live_nodes, live_edges = self.get_reward(G, optS, self.TrueP)
             optimal_reward, live_nodes, live_edges = self.get_reward_n(G, optS, self.TrueP)
             print('oracle', optS, optimal_reward)
+            self.result_oracle.append(optimal_reward)
 
             for alg_name, alg in list(algorithms.items()): 
                 S = alg.decide() #S is the selected seed nodes set.
@@ -90,12 +92,6 @@ class simulateOnlineData:
                 self.AlgRegret[alg_name].append(reward)
                 #AlgRegret[alg_name].append(reward)
 
-                #Calculate P estimation error
-                alg_P = alg.getP()
-                p_error = 0
-                for u in S:
-                    for (u, v) in self.G.edges(u):
-                        p_error += (alg_P[u][v]['weight'] - self.TrueP[u][v]['weight'])**2
                 # print alg_name, p_error
 
             if iter_%self.batchSize == 0:
@@ -116,18 +112,27 @@ class simulateOnlineData:
         #       print alg_name, u, v,alg.currentP[u][v]['weight']
 
         
-
+        print(np.mean(self.result_oracle))
         
         # plot the results  
         f, axa = plt.subplots(1, sharex=True)
         for alg_name in algorithms.keys():  
             axa.plot(tim_, self.BatchCumlateRegret[alg_name],label = alg_name)
-            print('%s: %.2f' % (alg_name, self.BatchCumlateRegret[alg_name][-1]))
+            print('%s: %.2f' % (alg_name, np.mean(self.BatchCumlateRegret[alg_name])))
+        axa.legend(loc='upper left',prop={'size':9})
+        axa.set_xlabel("Iteration")
+        axa.set_ylabel("Regret")
+        axa.set_title("Average Regret")
+        plt.show()
+
+        f, axa = plt.subplots(1, sharex=True)
+        for alg_name in algorithms.keys():  
+            result = [sum(simExperiment.BatchCumlateRegret[alg_name][:i]) for i in range(len(tim_))]
+            axa.plot(tim_, result, label = alg_name)
         axa.legend(loc='upper left',prop={'size':9})
         axa.set_xlabel("Iteration")
         axa.set_ylabel("Regret")
         axa.set_title("Accumulated Regret")
-        plt.savefig('./SimulationResults/Regret' + str(timeRun_Save )+'.pdf')
         plt.show()
 
 if __name__ == '__main__':
@@ -230,6 +235,6 @@ if __name__ == '__main__':
     # algorithms['CLUB_0.2'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
     algorithms['CLUB_1'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
     # algorithms['CLUB_4'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, 4.0, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
-    algorithms['CAB'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, gamma)
+    # algorithms['CAB'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, gamma)
 
     simExperiment.runAlgorithms(algorithms)
