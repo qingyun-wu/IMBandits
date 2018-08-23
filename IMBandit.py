@@ -1,22 +1,18 @@
-import random
-import heapq
-import datetime
-import networkx as nx
-import math
-import argparse
-import matplotlib.pyplot as plt
 import time
-import pickle 
 import os
+import pickle 
+import datetime
 import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
 from conf import *
 
-from utilFunc import ReadGraph_NetHEPT_Epinions, ReadGraph_Flixster, ReadGraph_Flickr, ReadSmallGraph_Flixster
 from BanditAlgorithms import UCB1Algorithm, eGreedyAlgorithm 
 from BanditAlgorithms_LinUCB import N_LinUCBAlgorithm, LinUCBAlgorithm
 from BanditAlgorithms_CLUB import CLUBAlgorithm
 from IM_CAB import CABAlgorithm
 from IC.IC import runIC, runICmodel, runICmodel_n
+from generalGreedy import generalGreedy
 from IC.runIAC  import weightedEp, runIAC, runIACmodel, randomEp, uniformEp
 
 class simulateOnlineData:
@@ -60,7 +56,7 @@ class simulateOnlineData:
 
             self.resultRecord(iter_)
 
-        self.showResuelt()
+        self.showResult()
 
     def resultRecord(self, iter_=None):
         # if initialize
@@ -74,7 +70,7 @@ class simulateOnlineData:
                 f.write(',' + ','.join( [str(alg_name) for alg_name in algorithms.keys()]))
                 f.write('\n') 
         else:
-            # if run in the experiment
+            # if run in the experiment, save the results
             if iter_ % self.batchSize == 0:
                 print("Iteration %d" % iter_, " Elapsed time", datetime.datetime.now() - self.startTime)
                 self.tim_.append(iter_)
