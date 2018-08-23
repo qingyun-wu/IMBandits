@@ -12,7 +12,6 @@ from BanditAlgorithms_LinUCB import N_LinUCBAlgorithm, LinUCBAlgorithm
 from BanditAlgorithms_CLUB import CLUBAlgorithm
 from IM_CAB import CABAlgorithm
 from IC.IC import runIC, runICmodel, runICmodel_n
-from generalGreedy import generalGreedy
 from IC.runIAC  import weightedEp, runIAC, runIACmodel, randomEp, uniformEp
 
 class simulateOnlineData:
@@ -86,7 +85,7 @@ class simulateOnlineData:
         # plot average reward
         f, axa = plt.subplots(1, sharex=True)
         for alg_name in algorithms.keys():  
-            axa.plot(tim_, self.BatchCumlateReward[alg_name],label = alg_name)
+            axa.plot(self.tim_, self.BatchCumlateReward[alg_name],label = alg_name)
             print('%s: %.2f' % (alg_name, np.mean(self.BatchCumlateReward[alg_name])))
         axa.legend(loc='upper left',prop={'size':9})
         axa.set_xlabel("Iteration")
@@ -96,8 +95,8 @@ class simulateOnlineData:
         # plot accumulated reward
         f, axa = plt.subplots(1, sharex=True)
         for alg_name in algorithms.keys():  
-            result = [sum(simExperiment.BatchCumlateReward[alg_name][:i]) for i in range(len(tim_))]
-            axa.plot(tim_, result, label = alg_name)
+            result = [sum(self.BatchCumlateReward[alg_name][:i]) for i in range(len(self.tim_))]
+            axa.plot(self.tim_, result, label = alg_name)
         axa.legend(loc='upper left',prop={'size':9})
         axa.set_xlabel("Iteration")
         axa.set_ylabel("Reward")
