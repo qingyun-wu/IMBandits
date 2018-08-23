@@ -21,11 +21,6 @@ def ReadGraph_Flixster(file_address):
 
 			except:
 				G.add_edge(u,v, weight=1)
-	
-
-	#pickle.dump( G, open( file_address + '.G', "wb" ))
-	#G = pickle.load(open(file_address + '.G', 'rb'))
-	#It may takes two minutes
 	print('Built Flixster graph G', time.time() - start, 's')
 
 
@@ -45,10 +40,6 @@ def ReadSmallGraph_Flixster(file_address):
 				except:
 					G.add_edge(u,v, weight=1)
 	
-
-	#pickle.dump( G, open( file_address + '.G', "wb" ))
-	#G = pickle.load(open(file_address + '.G', 'rb'))
-	#It may takes two minutes
 	print('Built Flixster graph G', time.time() - start, 's')
 
 

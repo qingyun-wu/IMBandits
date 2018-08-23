@@ -3,7 +3,7 @@ from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix
 import datetime
 import os.path
-from conf import sim_files_folder, save_address
+from conf import save_address
 from sklearn import linear_model
 from random import choice, random, sample
 import networkx as nx
