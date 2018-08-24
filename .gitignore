@@ -6,4 +6,4 @@ _*
 *.pyc
 *.bak
 datasets
-SimulationResults
+*.xlsx
