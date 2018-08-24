@@ -8,7 +8,7 @@ from sklearn import linear_model
 from random import choice, random, sample
 import networkx as nx
 import numpy as np
-from BanditAlgorithms_LinUCB import *
+from BanditAlg.BanditAlgorithms_LinUCB import *
 import collections
 class CABUserStruct(LinUCBUserStruct):
     def __init__(self, featureDimension,  lambda_, userID):

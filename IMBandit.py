@@ -7,10 +7,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from conf import *
 
-from BanditAlgorithms import UCB1Algorithm, eGreedyAlgorithm 
-from BanditAlgorithms_LinUCB import N_LinUCBAlgorithm, LinUCBAlgorithm
-from BanditAlgorithms_CLUB import CLUBAlgorithm
-from IM_CAB import CABAlgorithm
+from BanditAlg.BanditAlgorithms import UCB1Algorithm, eGreedyAlgorithm 
+from BanditAlg.BanditAlgorithms_LinUCB import N_LinUCBAlgorithm, LinUCBAlgorithm
+from BanditAlg.BanditAlgorithms_CLUB import CLUBAlgorithm
+from BanditAlg.BanditAlgorithms_CAB import CABAlgorithm
 from IC.IC import runIC, runICmodel, runICmodel_n
 from IC.runIAC  import weightedEp, runIAC, runIACmodel, randomEp, uniformEp
 

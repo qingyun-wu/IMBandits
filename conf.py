@@ -1,6 +1,6 @@
 import os
-from generalGreedy import generalGreedy
-from degreeDiscount import degreeDiscountIC, degreeDiscountIC2, degreeDiscountIAC, degreeDiscountIAC2, degreeDiscountStar
+from Oracle.generalGreedy import generalGreedy
+from Oracle.degreeDiscount import degreeDiscountIC, degreeDiscountIC2, degreeDiscountIAC, degreeDiscountIAC2, degreeDiscountStar
 
 save_address = "./SimulationResults"
 
