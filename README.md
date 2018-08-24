@@ -38,7 +38,7 @@ CLUB_Erodos: 1957.71
 CLUB_1: 1956.60
 ```
 
-![alt text](./pic/acuReward1.PNG)
+![alt text](./pic/avgReward1.PNG)
 
 ![alt text](./pic/acuReward1.PNG)
 
