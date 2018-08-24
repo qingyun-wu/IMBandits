@@ -38,9 +38,9 @@ CLUB_Erodos: 1957.71
 CLUB_1: 1956.60
 ```
 
-![alt text](./pic/avgReward1.PNG)
+![alt text](./pic/avgReward1.PNG | width=100)
 
-![alt text](./pic/acuReward1.PNG)
+![alt text](./pic/acuReward1.PNG | width=100)
 
 #### Parameter
 
@@ -77,6 +77,6 @@ CLUB_Erodos: 1881.93
 CLUB_1: 1874.47
 ```
 
-![alt text](./pic/avgReward2.PNG)
+![alt text](./pic/avgReward2.PNG | width=100)
 
-![alt text](./pic/acuReward2.PNG)
+![alt text](./pic/acuReward2.PNG | width=100)
