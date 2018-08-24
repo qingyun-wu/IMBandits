@@ -23,6 +23,6 @@ lambda_ = 0.3
 gamma = 0.1
 dimension = 4
 seed_size = 40
-iterations = 60
+iterations = 300
 
 oracle = degreeDiscountIAC2
