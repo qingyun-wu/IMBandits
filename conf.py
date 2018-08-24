@@ -3,12 +3,6 @@ from generalGreedy import generalGreedy
 from degreeDiscount import degreeDiscountIC, degreeDiscountIC2, degreeDiscountIAC, degreeDiscountIAC2, degreeDiscountStar
 
 save_address = "./SimulationResults"
-configure_address = './configure'
-graph30_edgefile_address = './datasets/graph30/graph30.txt'
-NetHEPT_edgefile_address = './datasets/NetHEPT/cit-HepTh.txt'
-Flixster_edgefile_address = './datasets/Flixster-dataset/data/edges.csv'
-Epinions_edgefile_address = './datasets/Epinions/soc-Epinions1.txt'
-Flickr_edgefile_address = './datasets/Flickr/flickrEdges.txt'
 
 graph_address = './datasets/Flickr/Small_Final_SubG.G'
 prob_address = './datasets/Flickr/Small_Final_Edge_P_Uniform_dim4'
