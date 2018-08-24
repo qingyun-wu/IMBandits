@@ -38,9 +38,9 @@ CLUB_Erodos: 1957.71
 CLUB_1: 1956.60
 ```
 
-![alt text](https://github.com/Elitack/IMBandits/blob/master/pic/acuReward1.PNG)
+![alt text](./pic/acuReward1.PNG)
 
-![alt text](https://github.com/Elitack/IMBandits/blob/master/pic/acuReward1.PNG)
+![alt text](./pic/acuReward1.PNG)
 
 #### Parameter
 
@@ -77,6 +77,6 @@ CLUB_Erodos: 1881.93
 CLUB_1: 1874.47
 ```
 
-![alt text](https://github.com/Elitack/IMBandits/blob/master/pic/avgReward2.PNG)
+![alt text](./pic/avgReward2.PNG)
 
-![alt text](https://github.com/Elitack/IMBandits/blob/master/pic/acuReward2.PNG)
+![alt text](./pic/acuReward2.PNG)
