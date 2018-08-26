@@ -5,6 +5,7 @@
 __author__ = 'ivanovsergey'
 
 from Tool.priorityQueue import PriorityQueue as PQ
+from IC.IC import runIC2
 
 def generalGreedy(G, k, p=.01):
     ''' Finds initial seed set S using general greedy heuristic
