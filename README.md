@@ -51,6 +51,7 @@ CLUB_1: 1956.60
 <img src="./SimulationResults/avgReward1.PNG" alt="alt text" width="400" height="300">
 <img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
 </p>
+
 #### Parameter
 
 ```python
