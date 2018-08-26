@@ -52,6 +52,22 @@ CLUB_1: 1956.60
 <img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
 </p>
 
+For another dataset sampled in the same way by Flickr:
+```
+average reward for oracle: 2001.77
+LinUCB: 2002.15
+Uniform_LinUCB: 1983.17
+UCB1: 1980.37
+egreedy_0: 1998.01
+egreedy_0.1: 1921.00
+egreedy_1: 1438.44
+CLUB_Erodos: 1984.28
+CLUB_1: 1984.9
+```
+<p float="left">
+<img src="./SimulationResults/avgReward1.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
+</p>
 #### Parameter
 
 ```python
@@ -90,4 +106,22 @@ CLUB_1: 1874.47
 <p float="left">
 <img src="./SimulationResults/avgReward2.PNG" alt="alt text" width="400" height="300">
 <img src="./SimulationResults/acuReward2.PNG" alt="alt text" width="400" height="300">
+</p>
+
+For another dataset sampled in the same way by Flickr:
+```
+average reward for oracle: 1987.7866666666666
+LinUCB: 1967.71
+Uniform_LinUCB: 1527.14
+UCB1: 1528.11
+egreedy_0: 1984.75
+egreedy_0.1: 1933.33
+egreedy_1: 1436.94
+CLUB_Erodos: 1946.78
+CLUB_1: 1945.93
+
+```
+<p float="left">
+<img src="./SimulationResults/avgReward1.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
 </p>
