@@ -10,6 +10,8 @@ IC/IC.py -- Independent cascade model, runIC() returns influence result given se
 
 ### Result
 
+**Attention: The oracle for general greedy and the Bandit algorithm for cab consume so so so so so much time and they are not recommended for experiment.**
+
 #### Parameter
 
 ```python
