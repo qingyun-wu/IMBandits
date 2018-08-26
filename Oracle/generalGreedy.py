@@ -26,7 +26,7 @@ def generalGreedy(G, k, p):
                 s.add_task(v, 0) # initialize spread value
                 for j in range(R): # run R times Random Cascade
                     [priority, count, task] = s.entry_finder[v]
-                    s.add_task(v, priority - runICmodel_n(G, S + [v], p)/R) # add normalized spread value
+                    s.add_task(v, priority - runICmodel_n(G, S + [v], p)[0]/R) # add normalized spread value
         task, priority = s.pop_item()
         S.append(task)
         print(i, k, time.time() - start)
