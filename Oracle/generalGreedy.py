@@ -29,5 +29,5 @@ def generalGreedy(G, k, p):
                     s.add_task(v, priority - runICmodel_n(G, S + [v], p)[0]/R) # add normalized spread value
         task, priority = s.pop_item()
         S.append(task)
-        print(i, k, time.time() - start)
+        # print(i, k, time.time() - start)
     return S
