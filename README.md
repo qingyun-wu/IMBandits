@@ -65,9 +65,10 @@ CLUB_Erodos: 1984.28
 CLUB_1: 1984.9
 ```
 <p float="left">
-<img src="./SimulationResults/avgReward1.PNG" alt="alt text" width="400" height="300">
-<img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/avgReward3.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/acuReward3.PNG" alt="alt text" width="400" height="300">
 </p>
+
 #### Parameter
 
 ```python
@@ -122,6 +123,7 @@ CLUB_1: 1945.93
 
 ```
 <p float="left">
-<img src="./SimulationResults/avgReward1.PNG" alt="alt text" width="400" height="300">
-<img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/avgReward4.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/acuReward4.PNG" alt="alt text" width="400" height="300">
 </p>
+
