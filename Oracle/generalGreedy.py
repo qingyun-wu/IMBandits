@@ -16,7 +16,7 @@ def generalGreedy(G, k, p):
     '''
     import time
     start = time.time()
-    R = 5 # number of times to run Random Cascade
+    R = 1 # number of times to run Random Cascade
     S = [] # set of selected nodes
     # add node to S if achieves maximum propagation for current chosen + this node
     for i in range(k):
