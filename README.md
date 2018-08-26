@@ -86,7 +86,7 @@ CLUB_Erodos: 1881.93
 CLUB_1: 1874.47
 ```
 
-!<p float="left">
+<p float="left">
 <img src="./SimulationResults/avgReward2.PNG" alt="alt text" width="400" height="300">
 <img src="./SimulationResults/acuReward2.PNG" alt="alt text" width="400" height="300">
 </p>
