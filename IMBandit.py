@@ -17,7 +17,6 @@ from IC.runIAC  import weightedEp, runIAC, runIACmodel, randomEp, uniformEp
 class simulateOnlineData:
     def __init__(self, G, P, oracle, seed_size, iterations, batchSize, dataset):
         self.G = G
-        self.TrueP = P
         self.seed_size = seed_size
         self.oracle = oracle
         self.iterations = iterations
@@ -27,7 +26,10 @@ class simulateOnlineData:
         self.BatchCumlateReward = {}
         self.AlgReward = {}
         self.result_oracle = []
-
+        self.TrueP = nx.DiGraph()
+        for (u,v) in G.edges():
+            self.TrueP.add_edge(u, v, weight=FeatureScaling)
+            
     def runAlgorithms(self, algorithms):
         self.tim_ = []
         for alg_name, alg in list(algorithms.items()):
@@ -109,18 +111,15 @@ if __name__ == '__main__':
     start = time.time()
 
     G = pickle.load(open(graph_address, 'rb'), encoding='latin1')
-    prob = pickle.load(open(prob_address, 'rb'), encoding='latin1')
     feature_dic = pickle.load(open(feature_address, 'rb'), encoding='latin1')
 
-    P = nx.DiGraph()
-    for (u,v) in G.edges():
-        P.add_edge(u, v, weight=FeatureScaling*prob[(u,v)])
+
     print('nodes:', len(G.nodes()))
     print('edges:', len(G.edges()))
     print('Done with Loading Feature')
     print('Graph build time:', time.time() - start)
 
-    simExperiment = simulateOnlineData(G, P, oracle, seed_size, iterations, batchSize, dataset)
+    simExperiment = simulateOnlineData(G, oracle, seed_size, iterations, batchSize, dataset)
 
     algorithms = {}
     algorithms['LinUCB'] = N_LinUCBAlgorithm(G, seed_size, oracle, dimension, alpha, lambda_, feature_dic, FeatureScaling)
