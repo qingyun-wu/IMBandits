@@ -7,7 +7,25 @@ import argparse
 import matplotlib.pyplot as plt
 import time
 import pickle
+from conf import *
 
+def gen_P(iteration):
+
+	def featureUniform(dimension, argv = None):
+		vector = np.array([random.random() for i in range(dimension)])
+		l2_norm = np.linalg.norm(vector, ord =2)
+		vector = vector/l2_norm
+		return vector
+
+	TopicList = pickle.load(open(topic_address , "rb" ))
+	EdgeFeatureDic = pickle.load(open(feature_address, "rb" ))
+	dimension = 4
+	PDic = {}
+
+	for key in EdgeFeatureDic:
+		PDic[key] = np.dot(EdgeFeatureDic[key], TopicList[iteration])
+
+	return PDic
 
 def ReadGraph_Flixster(file_address):
 	start = time.time()
