@@ -4,9 +4,9 @@ from Oracle.degreeDiscount import degreeDiscountIC, degreeDiscountIC2, degreeDis
 
 save_address = "./SimulationResults"
 
-graph_address = './datasets/Flickr/Small_Final_SubG.G'
-prob_address = './datasets/Flickr/Small_Final_Edge_P_Uniform_dim4'
-feature_address = './datasets/Flickr/Small_Final_Normalized_edgeFeatures_uniform_dim4.dic'
+graph_address = './datasets/Flickr-Topic/Small_Final_SubG.G'
+topic_address = './datasets/Flickr-Topic/TopicTheta.list'
+feature_address = './datasets/Flickr-Topic/Small_Final_Normalized_edgeFeatures_uniform_dim4.dic'
 
 dataset = 'Flickr' #Choose from 'default', 'NetHEPT', 'Flickr'
 FeatureScaling = 1.0
