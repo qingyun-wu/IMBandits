@@ -137,3 +137,4 @@ if __name__ == '__main__':
     # algorithms['CAB'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, gamma)
 
     simExperiment.runAlgorithms(algorithms)
+
