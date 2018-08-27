@@ -90,8 +90,8 @@ CLUB_Erodos: 1957.71
 CLUB_1: 1956.60
 ```
 <p float="left">
-<img src="./SimulationResults/avgReward1.png" alt="alt text" width="400" height="300">
-<img src="./SimulationResults/acuReward1.png" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/avgReward1.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
 </p>
 
 For another dataset sampled in the same way by Flickr:
@@ -107,8 +107,8 @@ CLUB_Erodos: 1984.28
 CLUB_1: 1984.9
 ```
 <p float="left">
-<img src="./SimulationResults/avgReward3.PNG" alt="alt text" width="400" height="300">
-<img src="./SimulationResults/acuReward3.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/avgReward3.PNG" alt="avgReward3" width="400" height="300">
+<img src="./SimulationResults/acuReward3.PNG" alt="acuReward3" width="400" height="300">
 </p>
 
 #### Parameter
