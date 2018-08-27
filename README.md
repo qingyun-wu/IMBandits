@@ -52,7 +52,7 @@ CLUB_1: 68.21
 <img src="./SimulationResults/acuRewardFinal.png" alt="alt text" width="400" height="300">
 </p>
 
-
+The above two figures are the result that work. The difference between the this and other results showed in README is that, the dataset is sampled from the nodes that have a the degree smaller than 20. While the others use the dataset sampled nodes which have degree larger than 40, so that almost every algorithm achieves a good result compared to the oracle.
 
 #### Parameter
 
