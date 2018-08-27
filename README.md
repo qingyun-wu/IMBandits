@@ -48,8 +48,8 @@ CLUB_1: 68.21
 ```
 
 <p float="left">
-<img src="./SimulationResults/avgRewardFinal.png" alt="alt text" width="400" height="300">
-<img src="./SimulationResults/acuRewardFinal.png" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/AvgRewardFinal.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/AcuRewardFinal.PNG" alt="alt text" width="400" height="300">
 </p>
 
 The above two figures are the result that work. The difference between the this and other results showed in README is that, the dataset is sampled from the nodes that have a the degree smaller than 20. While the others use the dataset sampled nodes which have degree larger than 40, so that almost every algorithm achieves a good result compared to the oracle.
@@ -90,8 +90,8 @@ CLUB_Erodos: 1957.71
 CLUB_1: 1956.60
 ```
 <p float="left">
-<img src="./SimulationResults/avgReward1.PNG" alt="alt text" width="400" height="300">
-<img src="./SimulationResults/acuReward1.PNG" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/avgReward1.png" alt="alt text" width="400" height="300">
+<img src="./SimulationResults/acuReward1.png" alt="alt text" width="400" height="300">
 </p>
 
 For another dataset sampled in the same way by Flickr:
