@@ -1,0 +1,10 @@
+*.csv
+*.ipynb
+.ipynb*
+_*
+*.npy
+*.pyc
+*.bak
+datasets
+*.xlsx
+*.pdf
