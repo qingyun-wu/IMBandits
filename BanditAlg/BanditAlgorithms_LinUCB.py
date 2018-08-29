@@ -4,7 +4,7 @@ import networkx as nx
 from BanditAlg.BanditAlgorithms import ArmBaseStruct
 
 class LinUCBUserStruct:
-	def __init__(self, featureDimension,lambda_, userID, RankoneInverse = False):
+	def __init__(self, featureDimension, lambda_, userID, RankoneInverse = False):
 		self.userID = userID
 		self.d = featureDimension
 		self.A = lambda_*np.identity(n = self.d)
@@ -17,7 +17,7 @@ class LinUCBUserStruct:
 		self.pta_max = 1
 		
 	def updateParameters(self, articlePicked_FeatureVector, click):
-		self.A += np.outer(articlePicked_FeatureVector,articlePicked_FeatureVector)
+		self.A += np.outer(articlePicked_FeatureVector, articlePicked_FeatureVector)
 		self.b += articlePicked_FeatureVector*click
 		if self.RankoneInverse:
 			temp = np.dot(self.AInv, articlePicked_FeatureVector)
@@ -39,15 +39,10 @@ class LinUCBUserStruct:
 		pta = mean + alpha * var
 		if pta > self.pta_max:
 			pta = self.pta_max
-		#print self.UserTheta
-		#print article_FeatureVector
-		#print pta, mean, alpha*var
-		# if mean >0:
-		# 	print 'largerthan0', mean
 		return pta
 
 class N_LinUCBAlgorithm:
-	def __init__(self, G, seed_size, oracle, dimension, alpha,  lambda_ , FeatureDic, FeatureScaling, feedback = 'edge'):
+	def __init__(self, G, seed_size, oracle, dimension, alpha,  lambda_ , FeatureScaling, feedback = 'edge'):
 		self.G = G
 		self.oracle = oracle
 		self.seed_size = seed_size
@@ -55,42 +50,36 @@ class N_LinUCBAlgorithm:
 		self.dimension = dimension
 		self.alpha = alpha
 		self.lambda_ = lambda_
-		self.FeatureDic = FeatureDic
 		self.FeatureScaling = FeatureScaling
 		self.feedback = feedback
 
 		self.currentP =nx.DiGraph()
 		self.users = {}  #Nodes
-		self.arms = {}
 		for u in self.G.nodes():
 			self.users[u] = LinUCBUserStruct(dimension, lambda_ , u)
 			for v in self.G[u]:
-				self.arms[(u,v)] = ArmBaseStruct((u,v))
 				self.currentP.add_edge(u,v, weight=random())
 
 	def decide(self):
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
-	def updateParameters(self, S, live_nodes, live_edges):
+	def updateParameters(self, S, live_nodes, live_edges, feature_vec):
 		for u in S:
 			for (u, v) in self.G.edges(u):
-				featureVector = self.FeatureScaling*self.FeatureDic[(u,v)]
 				if (u,v) in live_edges:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.arms[(u, v)].updateParameters(reward=reward)
-				# reward = self.arms[(u, v)].averageReward    #####Average Reward
-				self.users[u].updateParameters(featureVector, reward)
-				self.currentP[u][v]['weight']  = self.users[v].getProb(self.alpha, featureVector)
+				self.users[u].updateParameters(feature_vec, reward)
+				self.currentP[u][v]['weight']  = self.users[v].getProb(self.alpha, feature_vec)
 	def getCoTheta(self, userID):
 		return self.users[userID].UserTheta
 	def getP(self):
 		return self.currentP		
 
 class LinUCBAlgorithm:
-	def __init__(self, G, seed_size, oracle, dimension, alpha,  lambda_ , FeatureDic, feedback = 'edge'):
+	def __init__(self, G, seed_size, oracle, dimension, alpha,  lambda_ , feedback = 'edge'):
 		self.G = G
 		self.oracle = oracle
 		self.seed_size = seed_size
@@ -98,7 +87,6 @@ class LinUCBAlgorithm:
 		self.dimension = dimension
 		self.alpha = alpha
 		self.lambda_ = lambda_
-		self.FeatureDic = FeatureDic
 		self.feedback = feedback
 
 		self.currentP =nx.DiGraph()
@@ -111,16 +99,15 @@ class LinUCBAlgorithm:
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
-	def updateParameters(self, S, live_nodes, live_edges):
+	def updateParameters(self, S, live_nodes, live_edges, feature_vec):
 		for u in S:
 			for (u, v) in self.G.edges(u):
-				featureVector = self.FeatureDic[(u,v)]
 				if (u,v) in live_edges:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.USER.updateParameters(featureVector, reward)
-				self.currentP[u][v]['weight']  = self.USER.getProb(self.alpha, featureVector)
+				self.USER.updateParameters(feature_vec, reward)
+				self.currentP[u][v]['weight']  = self.USER.getProb(self.alpha, feature_vec)
 	def getCoTheta(self, userID):
 		return self.USER.UserTheta
 	def getP(self):
