@@ -6,7 +6,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from conf import *
-from utilFunc import *
+from Tool.utilFunc import *
 
 from BanditAlg.BanditAlgorithms import UCB1Algorithm, eGreedyAlgorithm 
 from BanditAlg.BanditAlgorithms_LinUCB import N_LinUCBAlgorithm, LinUCBAlgorithm
@@ -61,13 +61,11 @@ class simulateOnlineData:
         self.showResult()
 
     def get_TrueP(self, iter_):
-        PDic = {}
+        graph_p = nx.DiGraph()
         for key in self.feature_dic:
-            PDic[key] = np.dot(EdgeFeatureDic[key], TopicList[iteration])
-        p = nx.DiGraph()
-        for (u, v) in G.edges():
-            P.add_edge(u, v, weight=FeatureScaling*PDic[u, v])
-        return P
+            prob = np.dot(self.feature_dic[key], self.topic_list[iter_])
+            graph_p.add_edge(key[0], key[1], weight=FeatureScaling*prob)
+        return graph_p
         
     def resultRecord(self, iter_=None):
         # if initialize
