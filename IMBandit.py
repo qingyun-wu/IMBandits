@@ -130,16 +130,16 @@ if __name__ == '__main__':
     simExperiment = simulateOnlineData(G, oracle, seed_size, iterations, batchSize, feature_dic, topic_list, dataset)
 
     algorithms = {}
-    algorithms['LinUCB'] = N_LinUCBAlgorithm(G, seed_size, oracle, dimension, alpha, lambda_, feature_dic, FeatureScaling)
-    algorithms['Uniform_LinUCB'] = LinUCBAlgorithm(G, seed_size, oracle, dimension, alpha, lambda_, feature_dic)
+    algorithms['LinUCB'] = N_LinUCBAlgorithm(G, seed_size, oracle, dimension, alpha, lambda_, FeatureScaling)
+    algorithms['Uniform_LinUCB'] = LinUCBAlgorithm(G, seed_size, oracle, dimension, alpha, lambda_)
     algorithms['UCB1'] = UCB1Algorithm(G, seed_size, oracle)
     # algorithms['egreedy_0'] = eGreedyAlgorithm(G, seed_size, oracle, 0)
     algorithms['egreedy_0.1'] = eGreedyAlgorithm(G, seed_size, oracle, 0.1)
     # algorithms['egreedy_1'] = eGreedyAlgorithm(G, seed_size, oracle, 1.0)
     #algorithms['UCB1'] = UCB1Algorithm(G, seed_size, oracle)
-    algorithms['CLUB_Erodos'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, feature_dic, FeatureScaling)
+    algorithms['CLUB_Erodos'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureScaling)
     # algorithms['CLUB_0.2'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
-    algorithms['CLUB_1'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, feature_dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
+    algorithms['CLUB_1'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureScaling, feedback = 'edge',  cluster_init="none")
     # algorithms['CLUB_4'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, 4.0, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
     # algorithms['CAB'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, gamma)
 
