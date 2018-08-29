@@ -6,6 +6,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from conf import *
+from utilFunc import *
 
 from BanditAlg.BanditAlgorithms import UCB1Algorithm, eGreedyAlgorithm 
 from BanditAlg.BanditAlgorithms_LinUCB import N_LinUCBAlgorithm, LinUCBAlgorithm
@@ -15,7 +16,7 @@ from IC.IC import runIC, runICmodel, runICmodel_n
 from IC.runIAC  import weightedEp, runIAC, runIACmodel, randomEp, uniformEp
 
 class simulateOnlineData:
-    def __init__(self, G, P, oracle, seed_size, iterations, batchSize, dataset):
+    def __init__(self, G, oracle, seed_size, iterations, batchSize, feature_dic, topic_list, dataset):
         self.G = G
         self.seed_size = seed_size
         self.oracle = oracle
@@ -26,10 +27,10 @@ class simulateOnlineData:
         self.BatchCumlateReward = {}
         self.AlgReward = {}
         self.result_oracle = []
-        self.TrueP = nx.DiGraph()
-        for (u,v) in G.edges():
-            self.TrueP.add_edge(u, v, weight=FeatureScaling)
-            
+        self.feature_dic = feature_dic
+        self.topic_list = topic_list
+
+
     def runAlgorithms(self, algorithms):
         self.tim_ = []
         for alg_name, alg in list(algorithms.items()):
@@ -37,9 +38,9 @@ class simulateOnlineData:
             self.BatchCumlateReward[alg_name] = []
 
         self.resultRecord()
-        optS = self.oracle(self.G, self.seed_size, self.TrueP)
 
         for iter_ in range(self.iterations):
+            TrueP = self.get_TrueP(iter_)
             optimal_reward, live_nodes, live_edges = runICmodel_n(G, optS, self.TrueP)
             self.result_oracle.append(optimal_reward)
             print('oracle', optimal_reward)
@@ -59,6 +60,15 @@ class simulateOnlineData:
 
         self.showResult()
 
+    def get_TrueP(self, iter_):
+        PDic = {}
+        for key in self.feature_dic:
+            PDic[key] = np.dot(EdgeFeatureDic[key], TopicList[iteration])
+        p = nx.DiGraph()
+        for (u, v) in G.edges():
+            P.add_edge(u, v, weight=FeatureScaling*PDic[u, v])
+        return P
+        
     def resultRecord(self, iter_=None):
         # if initialize
         if iter_ is None:
@@ -112,14 +122,14 @@ if __name__ == '__main__':
 
     G = pickle.load(open(graph_address, 'rb'), encoding='latin1')
     feature_dic = pickle.load(open(feature_address, 'rb'), encoding='latin1')
-
+    topic_list = pickle.load(open(topic_address , "rb" ), encoding='latin1')
 
     print('nodes:', len(G.nodes()))
     print('edges:', len(G.edges()))
     print('Done with Loading Feature')
     print('Graph build time:', time.time() - start)
 
-    simExperiment = simulateOnlineData(G, oracle, seed_size, iterations, batchSize, dataset)
+    simExperiment = simulateOnlineData(G, oracle, seed_size, iterations, batchSize, feature_dic, topic_list, dataset)
 
     algorithms = {}
     algorithms['LinUCB'] = N_LinUCBAlgorithm(G, seed_size, oracle, dimension, alpha, lambda_, feature_dic, FeatureScaling)

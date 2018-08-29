@@ -10,13 +10,6 @@ import pickle
 from conf import *
 
 def gen_P(iteration):
-
-	def featureUniform(dimension, argv = None):
-		vector = np.array([random.random() for i in range(dimension)])
-		l2_norm = np.linalg.norm(vector, ord =2)
-		vector = vector/l2_norm
-		return vector
-
 	TopicList = pickle.load(open(topic_address , "rb" ))
 	EdgeFeatureDic = pickle.load(open(feature_address, "rb" ))
 	dimension = 4
@@ -26,6 +19,12 @@ def gen_P(iteration):
 		PDic[key] = np.dot(EdgeFeatureDic[key], TopicList[iteration])
 
 	return PDic
+
+def featureUniform(dimension, argv = None):
+	vector = np.array([random.random() for i in range(dimension)])
+	l2_norm = np.linalg.norm(vector, ord =2)
+	vector = vector/l2_norm
+	return vector
 
 def ReadGraph_Flixster(file_address):
 	start = time.time()
@@ -41,8 +40,8 @@ def ReadGraph_Flixster(file_address):
 				G.add_edge(u,v, weight=1)
 	print('Built Flixster graph G', time.time() - start, 's')
 
-
 	return G
+
 def ReadSmallGraph_Flixster(file_address):
 	start = time.time()
 	total = 701784775
@@ -59,8 +58,6 @@ def ReadSmallGraph_Flixster(file_address):
 					G.add_edge(u,v, weight=1)
 	
 	print('Built Flixster graph G', time.time() - start, 's')
-
-
 	return G
 	
 def ReadGraph_NetHEPT_Epinions(file_address):
