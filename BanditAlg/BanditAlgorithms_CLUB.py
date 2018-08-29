@@ -54,7 +54,7 @@ class CLUBUserStruct(LinUCBUserStruct):
 		return pta
 
 class CLUBAlgorithm:
-	def __init__(self, G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureDic, FeatureScaling, feedback = 'edge',  cluster_init="Erdos-Renyi"):
+	def __init__(self, G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureScaling, feedback = 'edge',  cluster_init="Erdos-Renyi"):
 		self.time = 0
 		self.G = G
 		self.oracle = oracle
@@ -65,7 +65,6 @@ class CLUBAlgorithm:
 		self.alpha = alpha
 		self.alpha_2 = alpha_2
 		self.lambda_ = lambda_
-		self.FeatureDic = FeatureDic
 		self.FeatureScaling = FeatureScaling
 
 		self.users = {}  #Nodes
@@ -99,15 +98,14 @@ class CLUBAlgorithm:
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
-	def updateParameters(self, S, live_nodes, live_edges):
+	def updateParameters(self, S, live_nodes, live_edges, feature_vec):
 		for u in S:
 			for (u, v) in self.G.edges(u):
-				featureVector = self.FeatureScaling*self.FeatureDic[(u,v)]
 				if (u,v) in live_edges:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.SortedUsers[u].updateParameters(featureVector, reward, self.alpha_2)
+				self.SortedUsers[u].updateParameters(feature_vec, reward, self.alpha_2)
 			self.updateGraphClusters(u, 'False')
 		# print 'Start connected component'
 		N_components, component_list = connected_components(csr_matrix(self.Graph))
@@ -116,9 +114,8 @@ class CLUBAlgorithm:
 		self.clusters = component_list
 		for u in S:
 			self.SortedUsers[u].updateParametersofClusters(self.clusters, u, self.Graph, self.SortedUsers, self.userIDSortedList)
-			for (u, v) in self.G.edges(u):		
-				featureVector = self.FeatureScaling * self.FeatureDic[(u,v)]		
-				self.currentP[u][v]['weight']  = self.SortedUsers[u].getProb(self.alpha, featureVector, self.time)
+			for (u, v) in self.G.edges(u):				
+				self.currentP[u][v]['weight']  = self.SortedUsers[u].getProb(self.alpha, feature_vec, self.time)
 		
 	def updateGraphClusters(self,userID, binaryRatio):
 		n = len(self.SortedUsers)
