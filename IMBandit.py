@@ -50,9 +50,9 @@ class simulateOnlineData:
                 reward, live_nodes, live_edges = runICmodel_n(G, S, self.TrueP)
 
                 if alg.feedback == 'node':
-                    alg.updateParameters(S, live_nodes)
+                    alg.updateParameters(S, live_nodes, self.topic_list[iter_])
                 elif alg.feedback == 'edge':
-                    alg.updateParameters(S, live_nodes, live_edges)
+                    alg.updateParameters(S, live_nodes, live_edges, self.topic_list[iter_])
 
                 self.AlgReward[alg_name].append(reward)
 
