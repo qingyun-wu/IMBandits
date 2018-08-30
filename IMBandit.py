@@ -38,16 +38,16 @@ class simulateOnlineData:
             self.BatchCumlateReward[alg_name] = []
 
         self.resultRecord()
-
         for iter_ in range(self.iterations):
             TrueP = self.get_TrueP(iter_)
-            optimal_reward, live_nodes, live_edges = runICmodel_n(G, optS, self.TrueP)
+            optS = self.oracle(self.G, self.seed_size, TrueP)
+            optimal_reward, live_nodes, live_edges = runICmodel_n(G, optS, TrueP)
             self.result_oracle.append(optimal_reward)
             print('oracle', optimal_reward)
             
             for alg_name, alg in list(algorithms.items()): 
                 S = alg.decide() 
-                reward, live_nodes, live_edges = runICmodel_n(G, S, self.TrueP)
+                reward, live_nodes, live_edges = runICmodel_n(G, S, TrueP)
 
                 if alg.feedback == 'node':
                     alg.updateParameters(S, live_nodes, self.topic_list[iter_])
@@ -112,8 +112,8 @@ class simulateOnlineData:
         axa.set_xlabel("Iteration")
         axa.set_ylabel("Reward")
         axa.set_title("Accumulated Reward")
-        plt.savefig('./SimulationResults/AcuReward' + str(self.startTime.strftime('_%m_%d_%H_%M'))+'.pdf')
         plt.show()
+        plt.savefig('./SimulationResults/AcuReward' + str(self.startTime.strftime('_%m_%d_%H_%M'))+'.pdf')
 
 if __name__ == '__main__':
     start = time.time()
