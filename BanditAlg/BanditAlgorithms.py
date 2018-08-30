@@ -59,7 +59,7 @@ class UCB1Algorithm:
         S = self.oracle(self.G, self.seed_size, self.currentP)
         return S       
          
-    def updateParameters(self, S, live_nodes, live_edges): 
+    def updateParameters(self, S, live_nodes, live_edges, feature_vec): 
         for u in S:
             for (u, v) in self.G.edges(u):
                 if (u,v) in live_edges:
@@ -97,7 +97,7 @@ class eGreedyAlgorithm:
             S = self.oracle(self.G, self.seed_size, self.currentP)# self.oracle(self.G, self.seed_size, self.arms)
         return S
 
-    def updateParameters(self, S, live_nodes, live_edges): 
+    def updateParameters(self, S, live_nodes, live_edges, feature_vec): 
         for u in S:
             for (u, v) in self.G.edges(u):
                 if (u,v) in live_edges:
