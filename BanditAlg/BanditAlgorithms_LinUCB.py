@@ -10,7 +10,7 @@ class LinUCBArmStruct:
 		self.A = lambda_*np.identity(n = self.d)
 		self.b = np.zeros(self.d)
 		self.AInv = np.linalg.inv(self.A)
-		self.UserTheta = np.zeros(self.d)
+		self.ArmTheta = np.zeros(self.d)
 
 		self.RankoneInverse = RankoneInverse
 
@@ -25,16 +25,16 @@ class LinUCBArmStruct:
 		else:
 			self.AInv =  np.linalg.inv(self.A)
 
-		self.UserTheta = np.dot(self.AInv, self.b)
+		self.ArmTheta = np.dot(self.AInv, self.b)
 		
 	def getTheta(self):
-		return self.UserTheta
+		return self.ArmTheta
 	
 	def getA(self):
 		return self.A
 
 	def getProb(self, alpha, article_FeatureVector):
-		mean = np.dot(self.UserTheta,  article_FeatureVector)
+		mean = np.dot(self.ArmTheta,  article_FeatureVector)
 		var = np.sqrt(np.dot(np.dot(article_FeatureVector, self.AInv),  article_FeatureVector))
 		pta = mean + alpha * var
 		if pta > self.pta_max:
@@ -74,7 +74,7 @@ class N_LinUCBAlgorithm:
 				self.arms[(u, v)].updateParameters(feature_vec, reward)
 				self.currentP[u][v]['weight']  = self.arms[(u, v)].getProb(self.alpha, feature_vec)
 	def getCoTheta(self, armID):
-		return self.arms[armID].UserTheta
+		return self.arms[armID].ArmTheta
 	def getP(self):
 		return self.currentP		
 
@@ -108,7 +108,7 @@ class LinUCBAlgorithm:
 					reward = 0
 				self.arm.updateParameters(feature_vec, reward)
 				self.currentP[u][v]['weight']  = self.arm.getProb(self.alpha, feature_vec)
-	def getCoTheta(self, userID):
-		return self.arm.UserTheta
+	def getCoTheta(self, ArmID):
+		return self.arm.ArmTheta
 	def getP(self):
 		return self.currentP
