@@ -40,7 +40,7 @@ class CLUBArmStruct(LinUCBArmStruct):
 		for i in range(len(clusters)):
 			armID_GraphIndex = sortedArmList.index(armID)
 			if clusters[i] == clusters[armID_GraphIndex]:
-				self.CA += float(Graph[armID_GraphIndex, i])*(armrs[ sortedArmList[i]  ].A - self.I)
+				self.CA += float(Graph[armID_GraphIndex, i])*(arms[ sortedArmList[i]  ].A - self.I)
 				self.Cb += float(Graph[armID_GraphIndex, i])*arms[sortedArmList[i] ].b
 		self.CAInv = np.linalg.inv(self.CA)
 		self.CTheta = np.dot(self.CAInv,self.Cb)
@@ -76,7 +76,7 @@ class CLUBAlgorithm:
 		n = len(self.arms)
 		#print 'usersNum', n
 		#print len(self.users.keys()), type(self.users.keys())
-		self.armIDSortedList = list(self.arm.keys())
+		self.armIDSortedList = list(self.arms.keys())
 		self.armIDSortedList.sort()
 		#print len(self.userIDSortedList)
 		self.SortedArms = collections.OrderedDict(sorted(self.arms.items()))
@@ -99,10 +99,9 @@ class CLUBAlgorithm:
 		print('N_components:',N_components)
 		# print 'End connected component'
 		self.clusters = component_list
-		for u in S:
-			for (u, v) in self.G.edges(u):				
-				self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, u, self.Graph, self.SortedArms, self.armIDSortedList)
-				self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
+		for (u, v) in self.G.edges():				
+			self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, (u,v), self.Graph, self.SortedArms, self.armIDSortedList)
+			self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 

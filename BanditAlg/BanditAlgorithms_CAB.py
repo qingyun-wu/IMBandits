@@ -34,7 +34,7 @@ class CABArmStruct(LinUCBArmStruct):
         return pta
 
 class CABAlgorithm():
-    def __init__(self, G, seed_size, oracle, dimension, alpha,  alpha_2, lambda_, FeatureDic, FeatureScaling, gamma):
+    def __init__(self, G, seed_size, oracle, dimension, alpha,  alpha_2, lambda_, FeatureScaling, gamma):
         self.time = 0
         self.G = G
         self.oracle = oracle
@@ -44,7 +44,6 @@ class CABAlgorithm():
         self.alpha_2 = alpha_2
         self.lambda_ = lambda_
         self.gamma = gamma
-        self.FeatureDic = FeatureDic
         self.FeatureScaling = FeatureScaling
         self.feedback = 'edge'
         self.arms = {}  #Nodes
