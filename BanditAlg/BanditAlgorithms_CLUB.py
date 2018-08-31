@@ -95,13 +95,6 @@ class CLUBAlgorithm:
 			
 	def decide(self, feature_vec):
 		self.time +=1
-		N_components, component_list = connected_components(csr_matrix(self.Graph))
-		print('N_components:',N_components)
-		# print 'End connected component'
-		self.clusters = component_list
-		for (u, v) in self.G.edges():				
-			self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, (u,v), self.Graph, self.SortedArms, self.armIDSortedList)
-			self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
@@ -114,6 +107,14 @@ class CLUBAlgorithm:
 					reward = 0
 				self.SortedArms[(u, v)].updateParameters(feature_vec, reward, self.alpha_2)
 				self.updateGraphClusters((u, v), 'False')
+				
+		N_components, component_list = connected_components(csr_matrix(self.Graph))
+		print('N_components:',N_components)
+		# print 'End connected component'
+		self.clusters = component_list
+		for (u, v) in self.G.edges():				
+			self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, (u,v), self.Graph, self.SortedArms, self.armIDSortedList)
+			self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
 		# print 'Start connected component'
 		
 	def updateGraphClusters(self, armID, binaryRatio):
