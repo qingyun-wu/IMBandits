@@ -112,9 +112,10 @@ class CLUBAlgorithm:
 		print('N_components:',N_components)
 		# print 'End connected component'
 		self.clusters = component_list
-		for (u, v) in self.G.edges():				
-			self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, (u,v), self.Graph, self.SortedArms, self.armIDSortedList)
-			self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
+		for u in S:
+			for (u, v) in self.G.edges(u):			
+				self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, (u,v), self.Graph, self.SortedArms, self.armIDSortedList)
+				self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
 		# print 'Start connected component'
 		
 	def updateGraphClusters(self, armID, binaryRatio):
