@@ -51,7 +51,7 @@ class CABAlgorithm():
         for u in self.G.nodes():
             for v in self.G[u]:
                 self.arms[(u, v)] = CABArmStruct(dimension, lambda_, (u, v))
-                self.currentP.add_edge(u,v, weight=random())
+                self.currentP.add_edge(u, v, weight=random())
         n = len(self.arms)
 
         self.armIDSortedList = list(self.arms.keys())
@@ -93,7 +93,7 @@ class CABAlgorithm():
             x_pta = np.dot(CW, feature_vec) + CB
             if x_pta > 1:
                 x_pta = 1
-            self.currentP[id_i]['weight']  = x_pta
+            self.currentP[id_i[0]][id_i[1]]['weight']  = x_pta
             self.arms[id_i].cluster = clusterItem
 
     def updateParameters(self, S, live_nodes, live_edges, feature_vec):
