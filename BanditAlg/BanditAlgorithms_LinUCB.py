@@ -3,9 +3,9 @@ import numpy as np
 import networkx as nx
 from BanditAlg.BanditAlgorithms import ArmBaseStruct
 
-class LinUCBUserStruct:
-	def __init__(self, featureDimension, lambda_, userID, RankoneInverse = False):
-		self.userID = userID
+class LinUCBArmStruct:
+	def __init__(self, featureDimension, lambda_, armID, RankoneInverse = False):
+		self.armID = armID
 		self.d = featureDimension
 		self.A = lambda_*np.identity(n = self.d)
 		self.b = np.zeros(self.d)
@@ -54,13 +54,13 @@ class N_LinUCBAlgorithm:
 		self.feedback = feedback
 
 		self.currentP =nx.DiGraph()
-		self.users = {}  #Nodes
+		self.arms = {}  #Edges
 		for u in self.G.nodes():
-			self.users[u] = LinUCBUserStruct(dimension, lambda_ , u)
 			for v in self.G[u]:
-				self.currentP.add_edge(u,v, weight=random())
+				self.arms[(u, v)] = LinUCBArmStruct(dimension, lambda_ , (u, v))
+				self.currentP.add_edge(u, v, weight=random())
 
-	def decide(self):
+	def decide(self, feature_vec):
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
@@ -71,10 +71,10 @@ class N_LinUCBAlgorithm:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.users[u].updateParameters(feature_vec, reward)
-				self.currentP[u][v]['weight']  = self.users[v].getProb(self.alpha, feature_vec)
-	def getCoTheta(self, userID):
-		return self.users[userID].UserTheta
+				self.arms[(u, v)].updateParameters(feature_vec, reward)
+				self.currentP[u][v]['weight']  = self.arms[(u, v)].getProb(self.alpha, feature_vec)
+	def getCoTheta(self, armID):
+		return self.arms[armID].UserTheta
 	def getP(self):
 		return self.currentP		
 
@@ -90,12 +90,12 @@ class LinUCBAlgorithm:
 		self.feedback = feedback
 
 		self.currentP =nx.DiGraph()
-		self.USER = LinUCBUserStruct(dimension, lambda_ , 0)
+		self.arm = LinUCBArmStruct(dimension, lambda_ , (0,0))
 		for u in self.G.nodes():
 			for v in self.G[u]:
 				self.currentP.add_edge(u,v, weight=0)
 
-	def decide(self):
+	def decide(self, feature_vec):
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
@@ -106,9 +106,9 @@ class LinUCBAlgorithm:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.USER.updateParameters(feature_vec, reward)
-				self.currentP[u][v]['weight']  = self.USER.getProb(self.alpha, feature_vec)
+				self.arm.updateParameters(feature_vec, reward)
+				self.currentP[u][v]['weight']  = self.arm.getProb(self.alpha, feature_vec)
 	def getCoTheta(self, userID):
-		return self.USER.UserTheta
+		return self.arm.UserTheta
 	def getP(self):
 		return self.currentP
