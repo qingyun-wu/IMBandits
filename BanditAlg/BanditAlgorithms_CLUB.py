@@ -121,7 +121,7 @@ class CLUBAlgorithm:
 		n = len(self.SortedArms)
 		for j in self.SortedArms:
 			# print self.SortedUsers[userID].CBPrime, self.SortedUsers[j].CBPrime
-			ratio = float(np.linalg.norm(self.SortedArms[armID].UserTheta - self.SortedArms[j].UserTheta,2))/float(self.SortedArms[armID].CBPrime + self.SortedArms[j].CBPrime)
+			ratio = float(np.linalg.norm(self.SortedArms[armID].ArmTheta - self.SortedArms[j].ArmTheta,2))/float(self.SortedArms[armID].CBPrime + self.SortedArms[j].CBPrime)
 			#print float(np.linalg.norm(self.users[userID].UserTheta - self.users[j].UserTheta,2)),'R', ratio
 			if ratio > 1:
 				ratio = 0
@@ -137,6 +137,6 @@ class CLUBAlgorithm:
 		# print 'N_components:',N_components
 		return
 	def getLearntParameters(self, armID):
-		return self.arms[armID].UserTheta
+		return self.arms[armID].ArmTheta
 	def getP(self):
 		return self.currentP
