@@ -46,7 +46,7 @@ class simulateOnlineData:
             print('oracle', optimal_reward)
             
             for alg_name, alg in list(algorithms.items()): 
-                S = alg.decide() 
+                S = alg.decide(self.topic_list[iter_]) 
                 reward, live_nodes, live_edges = runICmodel_n(G, S, TrueP)
 
                 if alg.feedback == 'node':
