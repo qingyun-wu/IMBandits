@@ -141,7 +141,7 @@ if __name__ == '__main__':
     # algorithms['CLUB_0.2'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
     algorithms['CLUB_1'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureScaling, feedback = 'edge',  cluster_init="none")
     # algorithms['CLUB_4'] = CLUBAlgorithm(G, seed_size, oracle, dimension, alpha, 4.0, lambda_, Feature_Dic, FeatureScaling, feedback = 'edge',  cluster_init="none")
-    # algorithms['CAB'] = CABAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, Feature_Dic, FeatureScaling, gamma)
+    algorithms['CAB'] = CABAlgorithm(G, seed_size, oracle, dimension, alpha, alpha_2, lambda_, FeatureScaling, gamma)
 
     simExperiment.runAlgorithms(algorithms)
 
