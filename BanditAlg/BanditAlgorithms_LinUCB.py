@@ -90,7 +90,7 @@ class LinUCBAlgorithm:
 		self.feedback = feedback
 
 		self.currentP =nx.DiGraph()
-		self.arm = LinUCBArmStruct(dimension, lambda_ , (0,0))
+		self.arms = LinUCBArmStruct(dimension, lambda_ , (0,0))
 		for u in self.G.nodes():
 			for v in self.G[u]:
 				self.currentP.add_edge(u,v, weight=0)
@@ -106,9 +106,9 @@ class LinUCBAlgorithm:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.arm.updateParameters(feature_vec, reward)
-				self.currentP[u][v]['weight']  = self.arm.getProb(self.alpha, feature_vec)
+				self.arms.updateParameters(feature_vec, reward)
+				self.currentP[u][v]['weight']  = self.arms.getProb(self.alpha, feature_vec)
 	def getCoTheta(self, ArmID):
-		return self.arm.ArmTheta
+		return self.arms.ArmTheta
 	def getP(self):
 		return self.currentP
