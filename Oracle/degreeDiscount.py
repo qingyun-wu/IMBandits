@@ -52,7 +52,7 @@ def degreeDiscountIAC(G, k, Ep):
 
     # initialize degree discount
     for u in G.nodes():
-        d[u] = sum([G[u][v]['weight'] for v in G[u]]) # each edge adds degree 1
+        d[u] = sum([G[u][v]['weight']*Ep[u][v]['weight'] for v in G[u]]) # each edge adds degree 1
         # d[u] = len(G[u]) # each neighbor adds degree 1
         dd.add_task(u, -d[u]) # add degree of each node
         t[u] = 0
