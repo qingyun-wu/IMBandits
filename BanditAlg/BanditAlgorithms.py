@@ -60,7 +60,7 @@ class UCB1Algorithm:
         return S       
          
     def updateParameters(self, S, live_nodes, live_edges, feature_vec): 
-        for u in S:
+        for u in live_nodes:
             for (u, v) in self.G.edges(u):
                 if (u,v) in live_edges:
                     self.arms[(u, v)].updateParameters(reward=live_edges[(u,v)])
@@ -98,7 +98,7 @@ class eGreedyAlgorithm:
         return S
 
     def updateParameters(self, S, live_nodes, live_edges, feature_vec): 
-        for u in S:
+        for u in live_nodes:
             for (u, v) in self.G.edges(u):
                 if (u,v) in live_edges:
                     self.arms[(u, v)].updateParameters(reward=live_edges[(u,v)])

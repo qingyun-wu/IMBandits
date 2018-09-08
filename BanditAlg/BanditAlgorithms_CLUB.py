@@ -99,7 +99,7 @@ class CLUBAlgorithm:
 		return S
 
 	def updateParameters(self, S, live_nodes, live_edges, feature_vec):
-		for u in S:
+		for u in live_nodes:
 			for (u, v) in self.G.edges(u):
 				if (u,v) in live_edges:
 					reward = live_edges[(u,v)]
@@ -112,7 +112,7 @@ class CLUBAlgorithm:
 		print('N_components:',N_components)
 		# print 'End connected component'
 		self.clusters = component_list
-		for u in S:
+		for u in live_nodes:
 			for (u, v) in self.G.edges(u):			
 				self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, (u,v), self.Graph, self.SortedArms, self.armIDSortedList)
 				self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
@@ -123,6 +123,7 @@ class CLUBAlgorithm:
 		for j in self.SortedArms:
 			# print self.SortedUsers[userID].CBPrime, self.SortedUsers[j].CBPrime
 			ratio = float(np.linalg.norm(self.SortedArms[armID].ArmTheta - self.SortedArms[j].ArmTheta,2))/float(self.SortedArms[armID].CBPrime + self.SortedArms[j].CBPrime)
+
 			#print float(np.linalg.norm(self.users[userID].UserTheta - self.users[j].UserTheta,2)),'R', ratio
 			if ratio > 1:
 				ratio = 0

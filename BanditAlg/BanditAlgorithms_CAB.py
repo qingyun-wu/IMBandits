@@ -98,7 +98,7 @@ class CABAlgorithm():
 
     def updateParameters(self, S, live_nodes, live_edges, feature_vec):
         gamma = self.gamma
-        for u in S:
+        for u in live_nodes:
             for (u, v) in self.G.edges(u):
                 if (u,v) in live_edges:
                     reward = live_edges[(u,v)]
