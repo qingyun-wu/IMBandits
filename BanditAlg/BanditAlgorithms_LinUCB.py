@@ -3,14 +3,14 @@ import numpy as np
 import networkx as nx
 from BanditAlg.BanditAlgorithms import ArmBaseStruct
 
-class LinUCBUserStruct:
-	def __init__(self, featureDimension, lambda_, userID, RankoneInverse = False):
-		self.userID = userID
+class LinUCBArmStruct:
+	def __init__(self, featureDimension, lambda_, armID, RankoneInverse = False):
+		self.armID = armID
 		self.d = featureDimension
 		self.A = lambda_*np.identity(n = self.d)
 		self.b = np.zeros(self.d)
 		self.AInv = np.linalg.inv(self.A)
-		self.UserTheta = np.zeros(self.d)
+		self.ArmTheta = np.zeros(self.d)
 
 		self.RankoneInverse = RankoneInverse
 
@@ -25,16 +25,16 @@ class LinUCBUserStruct:
 		else:
 			self.AInv =  np.linalg.inv(self.A)
 
-		self.UserTheta = np.dot(self.AInv, self.b)
+		self.ArmTheta = np.dot(self.AInv, self.b)
 		
 	def getTheta(self):
-		return self.UserTheta
+		return self.ArmTheta
 	
 	def getA(self):
 		return self.A
 
 	def getProb(self, alpha, article_FeatureVector):
-		mean = np.dot(self.UserTheta,  article_FeatureVector)
+		mean = np.dot(self.ArmTheta,  article_FeatureVector)
 		var = np.sqrt(np.dot(np.dot(article_FeatureVector, self.AInv),  article_FeatureVector))
 		pta = mean + alpha * var
 		if pta > self.pta_max:
@@ -54,27 +54,27 @@ class N_LinUCBAlgorithm:
 		self.feedback = feedback
 
 		self.currentP =nx.DiGraph()
-		self.users = {}  #Nodes
+		self.arms = {}  #Edges
 		for u in self.G.nodes():
-			self.users[u] = LinUCBUserStruct(dimension, lambda_ , u)
 			for v in self.G[u]:
-				self.currentP.add_edge(u,v, weight=random())
+				self.arms[(u, v)] = LinUCBArmStruct(dimension, lambda_ , (u, v))
+				self.currentP.add_edge(u, v, weight=random())
 
-	def decide(self):
+	def decide(self, feature_vec):
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
 	def updateParameters(self, S, live_nodes, live_edges, feature_vec):
-		for u in S:
+		for u in live_nodes:
 			for (u, v) in self.G.edges(u):
 				if (u,v) in live_edges:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.users[u].updateParameters(feature_vec, reward)
-				self.currentP[u][v]['weight']  = self.users[v].getProb(self.alpha, feature_vec)
-	def getCoTheta(self, userID):
-		return self.users[userID].UserTheta
+				self.arms[(u, v)].updateParameters(feature_vec, reward)
+				self.currentP[u][v]['weight']  = self.arms[(u, v)].getProb(self.alpha, feature_vec)
+	def getCoTheta(self, armID):
+		return self.arms[armID].ArmTheta
 	def getP(self):
 		return self.currentP		
 
@@ -90,25 +90,25 @@ class LinUCBAlgorithm:
 		self.feedback = feedback
 
 		self.currentP =nx.DiGraph()
-		self.USER = LinUCBUserStruct(dimension, lambda_ , 0)
+		self.arm = LinUCBArmStruct(dimension, lambda_ , (0,0))
 		for u in self.G.nodes():
 			for v in self.G[u]:
 				self.currentP.add_edge(u,v, weight=0)
 
-	def decide(self):
+	def decide(self, feature_vec):
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
 	def updateParameters(self, S, live_nodes, live_edges, feature_vec):
-		for u in S:
+		for u in live_nodes:
 			for (u, v) in self.G.edges(u):
 				if (u,v) in live_edges:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.USER.updateParameters(feature_vec, reward)
-				self.currentP[u][v]['weight']  = self.USER.getProb(self.alpha, feature_vec)
-	def getCoTheta(self, userID):
-		return self.USER.UserTheta
+				self.arm.updateParameters(feature_vec, reward)
+				self.currentP[u][v]['weight']  = self.arm.getProb(self.alpha, feature_vec)
+	def getCoTheta(self, ArmID):
+		return self.arm.ArmTheta
 	def getP(self):
 		return self.currentP

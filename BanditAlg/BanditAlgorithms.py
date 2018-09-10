@@ -54,13 +54,13 @@ class UCB1Algorithm:
 
         self.TotalPlayCounter = 0
         
-    def decide(self):
+    def decide(self, feature_vec):
         self.TotalPlayCounter +=1
         S = self.oracle(self.G, self.seed_size, self.currentP)
         return S       
          
     def updateParameters(self, S, live_nodes, live_edges, feature_vec): 
-        for u in S:
+        for u in live_nodes:
             for (u, v) in self.G.edges(u):
                 if (u,v) in live_edges:
                     self.arms[(u, v)].updateParameters(reward=live_edges[(u,v)])
@@ -89,7 +89,7 @@ class eGreedyAlgorithm:
         self.TotalPlayCounter = 0
         self.epsilon = epsilon
 
-    def decide(self):
+    def decide(self, feature_vec):
         arm_Picked = None
         if random() < self.epsilon: # random exploration
             S = sample(list(self.G.nodes()), self.seed_size)
@@ -98,7 +98,7 @@ class eGreedyAlgorithm:
         return S
 
     def updateParameters(self, S, live_nodes, live_edges, feature_vec): 
-        for u in S:
+        for u in live_nodes:
             for (u, v) in self.G.edges(u):
                 if (u,v) in live_edges:
                     self.arms[(u, v)].updateParameters(reward=live_edges[(u,v)])

@@ -52,7 +52,7 @@ def degreeDiscountIAC(G, k, Ep):
 
     # initialize degree discount
     for u in G.nodes():
-        d[u] = sum([G[u][v]['weight'] for v in G[u]]) # each edge adds degree 1
+        d[u] = sum([G[u][v]['weight']*Ep[u][v]['weight'] for v in G[u]]) # each edge adds degree 1
         # d[u] = len(G[u]) # each neighbor adds degree 1
         dd.add_task(u, -d[u]) # add degree of each node
         t[u] = 0
@@ -98,6 +98,47 @@ def degreeDiscountIAC2(G, k, Ep):
                 t[v] += G[u][v]['weight'] # increase number of selected neighbors 
                 p = Ep[u][v]['weight']
                 priority = d[v] - 2*t[v]*p - (d[v] - t[v]*p)*t[v]*p # discount of degree
+                dd.add_task(v, -priority)
+    return S
+
+def degreeDiscountIAC3(G, k, Ep):
+    ''' Finds initial set of nodes to propagate in Independent Cascade model (with priority queue)
+    Input: G -- networkx graph object
+    k -- number of nodes needed
+    Ep -- propagation probability graph
+    Output:
+    S -- chosen k nodes
+    '''
+    S = []
+    dd = PQ() # degree discount
+    t = dict() # number of adjacent vertices that are in S
+    d = dict() # degree of each vertex
+
+    # initialize degree discount
+    for u in G.nodes():
+        d[u] = sum([G[u][v]['weight']*Ep[u][v]['weight'] for v in G[u]]) # each edge adds degree 1
+        # d[u] = len(G[u]) # each neighbor adds degree 1
+        dd.add_task(u, -d[u]) # add degree of each node
+        t[u] = 0
+
+    # add vertices to S greedily
+    for i in range(k):
+        u, priority = dd.pop_item() # extract node with maximal degree discount
+        S.append(u)
+        for v in G[u]:
+            if v not in S:
+                multi = 1
+                add = 0
+                for n in G.predecessors(v):
+                    if n in S:
+                        multi *= (1 - Ep[n][v])
+                for n in G[v]:
+                    if n in S:
+                        add -= Ep[v][n]
+                    else:
+                        add += Ep[v][n]
+                add += 1
+                priority = add * multi
                 dd.add_task(v, -priority)
     return S
 

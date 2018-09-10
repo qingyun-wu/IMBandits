@@ -8,9 +8,9 @@ from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix
 import collections
 
-class CLUBUserStruct(LinUCBUserStruct):
-	def __init__(self,featureDimension,  lambda_, userID):
-		LinUCBUserStruct.__init__(self,featureDimension = featureDimension, lambda_= lambda_, userID = userID)
+class CLUBArmStruct(LinUCBArmStruct):
+	def __init__(self,featureDimension,  lambda_, armID):
+		LinUCBArmStruct.__init__(self,featureDimension = featureDimension, lambda_= lambda_, armID = armID)
 		self.reward = 0
 		self.CA = self.A
 		self.Cb = self.b
@@ -26,22 +26,22 @@ class CLUBUserStruct(LinUCBUserStruct):
 		self.A += np.outer(articlePicked_FeatureVector,articlePicked_FeatureVector)
 		self.b += articlePicked_FeatureVector*click
 		self.AInv = np.linalg.inv(self.A)
-		self.UserTheta = np.dot(self.AInv, self.b)
+		self.ArmTheta = np.dot(self.AInv, self.b)
 		self.counter+=1
 		self.CBPrime = alpha_2*np.sqrt(float(1+math.log10(1+self.counter))/float(1+self.counter))
 		# if self.CBPrime == 0:
 		# 	print self.counter
 
-	def updateParametersofClusters(self,clusters,userID,Graph,users, sortedUserList):
+	def updateParametersofClusters(self,clusters,armID,Graph, arms, sortedArmList):
 		self.CA = self.I
 		self.Cb = np.zeros(self.d)
 		#print type(clusters)
 
 		for i in range(len(clusters)):
-			userID_GraphIndex = sortedUserList.index(userID)
-			if clusters[i] == clusters[userID_GraphIndex]:
-				self.CA += float(Graph[userID_GraphIndex, i])*(users[ sortedUserList[i]  ].A - self.I)
-				self.Cb += float(Graph[userID_GraphIndex, i])*users[sortedUserList[i] ].b
+			armID_GraphIndex = sortedArmList.index(armID)
+			if clusters[i] == clusters[armID_GraphIndex]:
+				self.CA += float(Graph[armID_GraphIndex, i])*(arms[ sortedArmList[i]  ].A - self.I)
+				self.Cb += float(Graph[armID_GraphIndex, i])*arms[sortedArmList[i] ].b
 		self.CAInv = np.linalg.inv(self.CA)
 		self.CTheta = np.dot(self.CAInv,self.Cb)
 
@@ -67,19 +67,19 @@ class CLUBAlgorithm:
 		self.lambda_ = lambda_
 		self.FeatureScaling = FeatureScaling
 
-		self.users = {}  #Nodes
+		self.arms = {}  #Nodes
 		self.currentP =nx.DiGraph()
 		for u in self.G.nodes():
-			self.users[u] = CLUBUserStruct(dimension,lambda_, u)
 			for v in self.G[u]:
+				self.arms[(u, v)] = CLUBArmStruct(dimension,lambda_, (u, v))
 				self.currentP.add_edge(u,v, weight=random())
-		n = len(self.users)
+		n = len(self.arms)
 		#print 'usersNum', n
 		#print len(self.users.keys()), type(self.users.keys())
-		self.userIDSortedList = list(self.users.keys())
-		self.userIDSortedList.sort()
+		self.armIDSortedList = list(self.arms.keys())
+		self.armIDSortedList.sort()
 		#print len(self.userIDSortedList)
-		self.SortedUsers = collections.OrderedDict(sorted(self.users.items()))
+		self.SortedArms = collections.OrderedDict(sorted(self.arms.items()))
 
 		if (cluster_init=="Erdos-Renyi"):
 			p = 3*math.log(n)/n
@@ -93,35 +93,37 @@ class CLUBAlgorithm:
 			N_components, components = connected_components(g)
 			self.clusters = []
 			
-	def decide(self):
+	def decide(self, feature_vec):
 		self.time +=1
 		S = self.oracle(self.G, self.seed_size, self.currentP)
 		return S
 
 	def updateParameters(self, S, live_nodes, live_edges, feature_vec):
-		for u in S:
+		for u in live_nodes:
 			for (u, v) in self.G.edges(u):
 				if (u,v) in live_edges:
 					reward = live_edges[(u,v)]
 				else:
 					reward = 0
-				self.SortedUsers[u].updateParameters(feature_vec, reward, self.alpha_2)
-			self.updateGraphClusters(u, 'False')
-		# print 'Start connected component'
+				self.SortedArms[(u, v)].updateParameters(feature_vec, reward, self.alpha_2)
+				self.updateGraphClusters((u, v), 'False')
+				
 		N_components, component_list = connected_components(csr_matrix(self.Graph))
 		print('N_components:',N_components)
 		# print 'End connected component'
 		self.clusters = component_list
-		for u in S:
-			self.SortedUsers[u].updateParametersofClusters(self.clusters, u, self.Graph, self.SortedUsers, self.userIDSortedList)
-			for (u, v) in self.G.edges(u):				
-				self.currentP[u][v]['weight']  = self.SortedUsers[u].getProb(self.alpha, feature_vec, self.time)
+		for u in live_nodes:
+			for (u, v) in self.G.edges(u):			
+				self.SortedArms[(u, v)].updateParametersofClusters(self.clusters, (u,v), self.Graph, self.SortedArms, self.armIDSortedList)
+				self.currentP[u][v]['weight']  = self.SortedArms[(u, v)].getProb(self.alpha, feature_vec, self.time)
+		# print 'Start connected component'
 		
-	def updateGraphClusters(self,userID, binaryRatio):
-		n = len(self.SortedUsers)
-		for j in self.SortedUsers:
+	def updateGraphClusters(self, armID, binaryRatio):
+		n = len(self.SortedArms)
+		for j in self.SortedArms:
 			# print self.SortedUsers[userID].CBPrime, self.SortedUsers[j].CBPrime
-			ratio = float(np.linalg.norm(self.SortedUsers[userID].UserTheta - self.SortedUsers[j].UserTheta,2))/float(self.SortedUsers[userID].CBPrime + self.SortedUsers[j].CBPrime)
+			ratio = float(np.linalg.norm(self.SortedArms[armID].ArmTheta - self.SortedArms[j].ArmTheta,2))/float(self.SortedArms[armID].CBPrime + self.SortedArms[j].CBPrime)
+
 			#print float(np.linalg.norm(self.users[userID].UserTheta - self.users[j].UserTheta,2)),'R', ratio
 			if ratio > 1:
 				ratio = 0
@@ -130,13 +132,13 @@ class CLUBAlgorithm:
 			elif binaryRatio == 'False':
 				ratio = 1.0/math.exp(ratio)
 			#print 'ratio',ratio
-			userID_GraphIndex = self.userIDSortedList.index(userID)
-			j_GraphIndex = self.userIDSortedList.index(j)
-			self.Graph[userID_GraphIndex][j_GraphIndex] = ratio
-			self.Graph[j_GraphIndex][userID_GraphIndex] = self.Graph[userID_GraphIndex][j_GraphIndex]
+			armID_GraphIndex = self.armIDSortedList.index(armID)
+			j_GraphIndex = self.armIDSortedList.index(j)
+			self.Graph[armID_GraphIndex][j_GraphIndex] = ratio
+			self.Graph[j_GraphIndex][armID_GraphIndex] = self.Graph[armID_GraphIndex][j_GraphIndex]
 		# print 'N_components:',N_components
 		return
-	def getLearntParameters(self, userID):
-		return self.users[userID].UserTheta
+	def getLearntParameters(self, armID):
+		return self.arms[armID].ArmTheta
 	def getP(self):
 		return self.currentP

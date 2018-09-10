@@ -3,6 +3,8 @@
 __author__ = 'ivanovsergey'
 from copy import deepcopy
 from random import random
+
+
 def runICmodel_n (G, S, P):
     ''' Runs independent cascade model.
     Input: G -- networkx graph object
@@ -10,36 +12,27 @@ def runICmodel_n (G, S, P):
     p -- propagation probability
     Output: T -- resulted influenced set of vertices (including S)
     '''
-    n = 3
     reward = 0
-    avgT = {}
-    for u in G.nodes():
-        avgT[u] = 0
-    for k in range(n):
-        T = deepcopy(S) # copy already selected nodes
-        E = {}
+    T = deepcopy(S) # copy already selected nodes
+    E = {}
 
-        # ugly C++ version
-        i = 0
-        while i < len(T):
-            for v in G[T[i]]: # for neighbors of a selected node                
-                w = G[T[i]][v]['weight'] # count the number of edges between two nodes
-                if random() <= 1 - (1-P[T[i]][v]['weight'])**w: # if at least one of edges propagate influence
-                        # print T[i], 'influences', v
-                    if v not in T: # if it wasn't selected yet
-                        T.append(v)
-                    avgT[v] += 1
-                    if (T[i], v) in E:
-                        E[(T[i], v)] += 1
-                    else:
-                        E[(T[i], v)] = 1
-            i += 1
-        reward += len(T)
-    for key in E:
-        E[key] /= 1.0*n
-    for u in G.nodes():
-        avgT[u] /= 1.0*n
-    return 1.0*reward/n, avgT, E
+    # ugly C++ version
+    i = 0
+    while i < len(T):
+        for v in G[T[i]]: # for neighbors of a selected node                
+            w = G[T[i]][v]['weight'] # count the number of edges between two nodes
+            if random() <= 1 - (1-P[T[i]][v]['weight'])**w: # if at least one of edges propagate influence
+                    # print T[i], 'influences', v
+                if v not in T: # if it wasn't selected yet
+                    T.append(v)
+                if (T[i], v) in E:
+                    E[(T[i], v)] += 1
+                else:
+                    E[(T[i], v)] = 1
+        i += 1
+    reward = len(T)
+
+    return reward, T, E
 
 def runICmodel (G, S, P):
     ''' Runs independent cascade model.
